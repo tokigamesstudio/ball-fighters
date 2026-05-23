@@ -309,9 +309,20 @@ window.addEventListener('balanceUpdate', (event) => {
 document.getElementById('btn-share').addEventListener('click', async () => {
   if (!currentResult || !currentResult.frames || currentResult.frames.length === 0) return;
   const seed = document.getElementById('seed-input').value;
-  const fighterA = currentResult.frames[0].fighters[0].type;
-  const fighterB = currentResult.frames[0].fighters[1].type;
-  const url = `${window.location.origin}${window.location.pathname}?seed=${seed}&a=${fighterA}&b=${fighterB}`;
+  const fighterA = currentResult.frames[0].fighters[0].id || currentResult.frames[0].fighters[0].type;
+  const fighterB = currentResult.frames[0].fighters[1].id || currentResult.frames[0].fighters[1].type;
+  const balance = rgs.getBalance();
+  const params = new URLSearchParams({
+    replay: '1',
+    seed,
+    a: fighterA,
+    b: fighterB,
+  });
+  if (balance?.currency) params.set('currency', balance.currency);
+  const stakeInput = document.getElementById('stake-input');
+  if (stakeInput?.value) params.set('amount', String(rgs.parseAmount(parseFloat(stakeInput.value))));
+
+  const url = `${window.location.origin}${window.location.pathname}?${params}`;
   
   try {
     await navigator.clipboard.writeText(url);
@@ -328,16 +339,84 @@ document.getElementById('btn-verify').addEventListener('click', () => {
   seedInput.style.display = seedInput.style.display === 'none' ? 'block' : 'none';
 });
 
-// URL parameter handling for auto-replay
+// URL parameter handling for replay mode
 const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.has('seed') && urlParams.has('a')) {
+const isReplay = urlParams.has('replay') || (urlParams.has('seed') && urlParams.has('a') && urlParams.has('b'));
+
+if (isReplay) {
   const seed = urlParams.get('seed');
   const fighterA = urlParams.get('a');
-  
-  // Pre-fill seed
+  const fighterB = urlParams.get('b') || 'quake';
+  const currency = urlParams.get('currency') || 'USD';
+  const lang = urlParams.get('lang') || 'en';
+  const amount = urlParams.get('amount');
+
+  // Hide betting UI, show replay UI
+  document.getElementById('fighter-select').style.display = 'none';
+  document.getElementById('btn-fight').style.display = 'none';
+  const stakeInput = document.getElementById('stake-input');
+  if (stakeInput) stakeInput.style.display = 'none';
+
+  // Show bet cost if amount provided
+  if (amount) {
+    const displayAmount = (parseInt(amount) / 1_000_000).toFixed(2);
+    const costEl = document.getElementById('replay-cost');
+    if (costEl) costEl.textContent = `Bet: ${displayAmount} ${currency}`;
+    else {
+      const el = document.createElement('div');
+      el.id = 'replay-cost';
+      el.style.cssText = 'position:absolute;top:10px;left:10px;color:#fff;font-size:14px;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:4px;z-index:100;';
+      el.textContent = `Bet: ${displayAmount} ${currency}`;
+      document.body.appendChild(el);
+    }
+  }
+
+  // Run replay
+  function runReplay() {
+    document.getElementById('winner-overlay').style.display = 'none';
+    document.getElementById('kill-feed').innerHTML = '';
+    killFeedEntries = [];
+    floatingTexts = [];
+    slowMotion = 0;
+    deathHoldFrames = 0;
+    screenShake = { x: 0, y: 0, intensity: 0 };
+    resetCracks();
+    resetExplosions();
+
+    const sim = new BattleSimulation(seed, [fighterA, fighterB]);
+    const result = sim.runAll();
+    currentResult = result;
+    frames = result.frames;
+    playbackFrame = 0;
+    playbackAccum = 0;
+    playing = true;
+    if (animId) cancelAnimationFrame(animId);
+
+    // Override playback end to show replay button
+    const origShowWinner = showWinner;
+    playback();
+  }
+
+  // Override the end-of-playback to show replay button
+  const _origPlayback = playback;
+
   document.getElementById('seed-input').value = seed;
-  
-  // Auto-select fighter
+  setTimeout(runReplay, 300);
+
+  // Create replay button (shown at end)
+  const replayBtn = document.getElementById('btn-play-again');
+  if (replayBtn) {
+    replayBtn.textContent = '↻ Replay';
+    replayBtn.onclick = () => {
+      document.getElementById('winner-overlay').style.display = 'none';
+      runReplay();
+    };
+  }
+} else if (urlParams.has('seed') && urlParams.has('a') && !urlParams.has('b')) {
+  // Legacy share link (no replay mode, just pre-select fighter)
+  const seed = urlParams.get('seed');
+  const fighterA = urlParams.get('a');
+  document.getElementById('seed-input').value = seed;
   const card = document.querySelector(`.fighter-card[data-fighter="${fighterA}"]`);
   if (card) {
     selectedFighter = fighterA;
@@ -346,11 +425,10 @@ if (urlParams.has('seed') && urlParams.has('a')) {
     card.style.borderColor = color;
     card.style.boxShadow = `0 0 20px ${color}40`;
     document.getElementById('btn-fight').disabled = false;
-    
-    // Auto-start after 500ms
-    setTimeout(() => startBattle(), 500);
   }
 }
 
-// Load balance on startup
-initRGS();
+// Load balance on startup (skip in replay mode)
+if (!isReplay) {
+  initRGS();
+}
