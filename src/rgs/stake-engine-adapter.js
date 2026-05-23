@@ -20,8 +20,8 @@ export class StakeEngineAdapter extends RGSAdapter {
   }
 
   async authenticate() {
-    // Dynamic import so the game doesn't hard-depend on stake-engine at module level
-    const { RGSClient, DisplayAmount } = await import('stake-engine');
+    // Import from CDN since we have no bundler
+    const { RGSClient, DisplayAmount } = await import('https://unpkg.com/stake-engine@0.1.32/dist/index.js');
     this._DisplayAmount = DisplayAmount;
 
     this._client = RGSClient({
