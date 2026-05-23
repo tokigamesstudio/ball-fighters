@@ -139,10 +139,7 @@ async function startBattle() {
   document.getElementById('balance-display').textContent = rgs.formatAmount(playResult.balance.amount);
 
   // Extract game state from round
-  // Stake Engine returns: state = { id, events: [{ seed, fighterA, fighterB, ... }], payoutMultiplier }
-  // Local adapter returns: state = { seed, fighterA, fighterB, ... }
-  const rawState = playResult.round.state || {};
-  const state = rawState.events?.[0] || rawState;
+  const state = playResult.round.state || {};
   const seed = state.seed;
   const fighterA = state.fighterA || selectedFighter;
   const fighterB = state.fighterB;

@@ -69,6 +69,10 @@ export class StakeEngineAdapter extends RGSAdapter {
     const { balance, round } = await this._client.Play({ amount, mode });
     this._balance = balance;
 
+    // Normalize: Stake Engine returns state as { id, events: [{ seed, fighterA, ... }], payoutMultiplier }
+    const rawState = round.state || {};
+    const gameState = rawState.events?.[0] || rawState;
+
     return {
       balance: { amount: balance.amount, currency: balance.currency },
       round: {
@@ -78,7 +82,7 @@ export class StakeEngineAdapter extends RGSAdapter {
         payoutMultiplier: round.payoutMultiplier,
         active: round.active,
         mode: round.mode,
-        state: round.state,
+        state: gameState,
       },
     };
   }
