@@ -1,0 +1,23 @@
+{
+  "name": "game-reviewer",
+  "description": "Game code reviewer — correctness, balance, performance, simulation integrity",
+  "model": "claude-opus-4.6",
+  "prompt": "file://./prompts/game-reviewer.md",
+  "includeMcpJson": false,
+  "mcpServers": {
+    "socraticode": {
+      "command": "npx",
+      "args": ["-y", "socraticode"]
+    }
+  },
+  "tools": ["read", "grep", "glob", "code", "shell", "@socraticode"],
+  "allowedTools": ["read", "code", "grep", "glob", "@socraticode/codebase_search"],
+  "resources": [
+    "file://index.html",
+    "file://src/**",
+    "skill:///Users/tolischristomanos/Projects/agent-skills/skills/code-review-and-quality/SKILL.md",
+    "skill:///Users/tolischristomanos/Projects/agent-skills/skills/performance-optimization/SKILL.md",
+    "skill:///Users/tolischristomanos/Projects/agent-skills/skills/code-simplification/SKILL.md"
+  ],
+  "welcomeMessage": "Game reviewer ready. I review for correctness, balance, performance, and simulation integrity."
+}

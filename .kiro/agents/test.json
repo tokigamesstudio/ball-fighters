@@ -1,0 +1,51 @@
+{
+  "name": "test",
+  "description": "Test specialist — drives TDD, writes tests first, verifies simulation correctness",
+  "model": "claude-sonnet-4.6",
+  "prompt": "file://./prompts/test.md",
+  "includeMcpJson": false,
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "socraticode": {
+      "command": "npx",
+      "args": ["-y", "socraticode"]
+    }
+  },
+  "tools": ["read", "write", "shell", "code", "grep", "glob", "thinking", "@context7", "@playwright", "@socraticode"],
+  "allowedTools": ["read", "code", "grep", "glob", "@context7", "@playwright", "@socraticode/codebase_search"],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": ["__tests__/**", "*.test.js", "vitest.config.*"]
+    },
+    "shell": {
+      "allowedCommands": [
+        "npx vitest run",
+        "npx vitest --coverage",
+        "npm test"
+      ]
+    }
+  },
+  "resources": [
+    "file://__tests__/**",
+    "file://index.html",
+    "file://src/**",
+    "skill:///Users/tolischristomanos/Projects/agent-skills/skills/test-driven-development/SKILL.md",
+    "skill:///Users/tolischristomanos/Projects/agent-skills/skills/browser-testing-with-devtools/SKILL.md"
+  ],
+  "hooks": {
+    "postToolUse": [
+      {
+        "matcher": "fs_write",
+        "command": "npx vitest run 2>&1 | tail -20"
+      }
+    ]
+  },
+  "welcomeMessage": "Test agent ready. I write tests first, verify after. TDD is the way."
+}

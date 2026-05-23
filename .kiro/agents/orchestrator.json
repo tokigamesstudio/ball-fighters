@@ -1,0 +1,24 @@
+{
+  "name": "orchestrator",
+  "description": "Arena Game Lead — decomposes tasks, delegates to specialist agents, enforces TDD workflow",
+  "model": "claude-sonnet-4.6",
+  "prompt": "file://./prompts/orchestrator.md",
+  "includeMcpJson": false,
+  "mcpServers": {
+    "obsidian": {
+      "command": "/Users/tolischristomanos/Documents/Obsidian Vault/.obsidian/plugins/mcp-tools/bin/mcp-server",
+      "args": [],
+      "env": {
+        "OBSIDIAN_API_KEY": "$OBSIDIAN_API_KEY"
+      }
+    }
+  },
+  "tools": ["read", "write", "subagent", "grep", "glob", "thinking", "todo_list", "shell", "@obsidian"],
+  "allowedTools": ["read", "subagent", "grep", "glob", "todo_list"],
+  "resources": [
+    "file://index.html",
+    "file://README.md",
+    "skill:///Users/tolischristomanos/Projects/agent-skills/skills/planning-and-task-breakdown/SKILL.md"
+  ],
+  "welcomeMessage": "Arena Game Lead ready. What are we building?"
+}

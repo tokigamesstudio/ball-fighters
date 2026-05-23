@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ARENA — Battle Simulation v2</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #000; font-family: 'Segoe UI', system-ui, sans-serif; color: #fff; overflow: hidden; touch-action: none; }
+#game-container { display: flex; flex-direction: column; align-items: center; height: 100vh; height: 100dvh; justify-content: center; gap: 8px; padding: 8px; }
+
+#top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 820px; padding: 0 4px; }
+#timer { font-size: 13px; color: #888; font-family: monospace; letter-spacing: 1px; }
+#speed-controls { display: flex; gap: 4px; }
+#speed-controls button { padding: 4px 10px; border: 1px solid #333; border-radius: 4px; background: #111; color: #888; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+#speed-controls button.active { border-color: #4f46e5; color: #fff; background: #1a1a3e; }
+
+#header { display: flex; justify-content: space-between; width: 100%; max-width: 820px; gap: 6px; flex-wrap: wrap; }
+.competitor-info { flex: 1; min-width: 140px; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); transition: all 0.3s; }
+.competitor-info.dead { opacity: 0.3; transform: scale(0.95); }
+.competitor-info .avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.competitor-info .info { flex: 1; min-width: 0; }
+.competitor-info .name { font-weight: 600; font-size: 12px; margin-bottom: 3px; display: flex; justify-content: space-between; }
+.competitor-info .hp-text { font-size: 10px; opacity: 0.6; font-family: monospace; }
+.competitor-info .hp-bar { width: 100%; height: 6px; background: #1a1a1a; border-radius: 3px; overflow: hidden; }
+.competitor-info .hp-fill { height: 100%; border-radius: 3px; transition: width 0.15s ease-out; }
+
+#canvas-wrap { position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 0 60px rgba(80,60,200,0.08), inset 0 0 80px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); }
+#arena { display: block; width: 100%; max-width: 600px; height: auto; aspect-ratio: 1/1; }
+#kill-feed { position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; gap: 4px; pointer-events: none; }
+.kill-entry { font-size: 11px; padding: 4px 8px; background: rgba(0,0,0,0.8); border-radius: 4px; border-left: 2px solid; animation: killSlide 0.3s ease-out; white-space: nowrap; }
+@keyframes killSlide { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+#winner-overlay { display: none; position: absolute; bottom: 0; left: 0; right: 0; height: 30%; background: linear-gradient(transparent, rgba(0,0,0,0.85) 55%); z-index: 100; align-items: center; justify-content: flex-end; flex-direction: column; padding-bottom: 18px; animation: fadeIn 0.4s ease-out; border-radius: 0 0 12px 12px; pointer-events: none; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+#winner-overlay h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; text-shadow: 0 0 16px currentColor; }
+#winner-overlay p { color: #aaa; font-size: 11px; }
+#winner-overlay .trophy { font-size: 24px; margin-bottom: 4px; }
+#winner-overlay .actions { display: flex; gap: 8px; margin-top: 8px; pointer-events: auto; }
+#winner-overlay .actions button, #winner-overlay .actions a { padding: 6px 12px; border: 1px solid #333; border-radius: 4px; background: transparent; color: #888; font-size: 11px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+#winner-overlay .actions button:hover, #winner-overlay .actions a:hover { border-color: #555; color: #fff; }
+
+#fighter-select { display: flex; gap: 12px; width: 100%; max-width: 820px; justify-content: center; flex-wrap: wrap; }
+.fighter-card { flex: 1; min-width: 160px; max-width: 200px; padding: 16px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s; text-align: center; }
+.fighter-card:hover { transform: translateY(-2px); background: rgba(255,255,255,0.05); }
+.fighter-card.selected { border-width: 2px; border-style: solid; box-shadow: 0 0 20px; }
+.fighter-card .color-swatch { width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 12px; }
+.fighter-card .fighter-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.fighter-card .fighter-tagline { font-size: 11px; color: #888; }
+.fighter-card .fighter-ability { font-size: 10px; color: #666; font-style: italic; margin-top: 4px; }
+
+#controls { display: flex; gap: 10px; align-items: center; }
+button { padding: 10px 24px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+#btn-fight { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff; box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+#btn-fight:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(79,70,229,0.4); }
+#btn-fight:disabled { opacity: 0.4; cursor: not-allowed; }
+#btn-reset { background: #111; color: #888; border: 1px solid #2a2a2a; display: none; }
+#btn-reset:hover { background: #1a1a1a; color: #fff; }
+#seed-input { font-size: 10px; color: #666; font-family: monospace; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 4px; padding: 4px 8px; width: 280px; text-align: center; outline: none; }
+#seed-input:focus { border-color: #2a2a2a; color: #888; }
+
+@media (max-width: 860px) {
+  #header { gap: 4px; }
+  .competitor-info { padding: 6px 8px; gap: 6px; min-width: 120px; }
+  .competitor-info .name { font-size: 11px; }
+  button { padding: 8px 16px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="top-bar">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div id="timer">00:00</div>
+      <button id="btn-paytable" style="background:none; border:1px solid #333; border-radius:4px; color:#666; font-size:11px; padding:3px 8px; cursor:pointer;">ℹ️ Paytable</button>
+    </div>
+    <div id="balance-display" style="font-size:13px; color:#4ade80; font-family:monospace; font-weight:600;">£1000.00</div>
+    <div id="speed-controls">
+      <button data-speed="0.75" class="active">1×</button>
+      <button data-speed="1.5">2×</button>
+      <button data-speed="3">4×</button>
+      <button data-speed="0.375">½×</button>
+    </div>
+  </div>
+  <div id="header"></div>
+  <div id="canvas-wrap">
+    <canvas id="arena" width="600" height="600"></canvas>
+    <div id="kill-feed"></div>
+    <div id="winner-overlay">
+      <div class="trophy">🏆</div>
+      <h2 id="winner-name"></h2>
+      <p id="winner-stats"></p>
+      <div class="actions">
+        <button id="btn-play-again">⚔️ Play Again</button>
+        <button id="btn-share">↗ Share</button>
+        <button id="btn-verify">🔍 Verify</button>
+      </div>
+    </div>
+  </div>
+  <div id="fighter-select">
+    <div class="fighter-card" data-fighter="blaze">
+      <div class="color-swatch" style="background: #ff4400;"></div>
+      <div class="fighter-name">Blaze</div>
+      <div class="fighter-tagline">Fast & Fiery</div>
+      <div class="fighter-ability">Leaves fire trails that burn enemies</div>
+    </div>
+    <div class="fighter-card" data-fighter="quake">
+      <div class="color-swatch" style="background: #8B4513;"></div>
+      <div class="fighter-name">Quake</div>
+      <div class="fighter-tagline">Ground & Pound</div>
+      <div class="fighter-ability">Shockwave blast pushes enemies back</div>
+    </div>
+    <div class="fighter-card" data-fighter="spark">
+      <div class="color-swatch" style="background: #FFD700;"></div>
+      <div class="fighter-name">Spark</div>
+      <div class="fighter-tagline">Shock & Awe</div>
+      <div class="fighter-ability">Bouncing electric bolts ricochet off walls</div>
+    </div>
+    <div class="fighter-card" data-fighter="phantom">
+      <div class="color-swatch" style="background: #9B59B6;"></div>
+      <div class="fighter-name">Phantom</div>
+      <div class="fighter-tagline">Hit & Run</div>
+      <div class="fighter-ability">Teleports to flank, fires shadow bolts</div>
+    </div>
+  </div>
+  <div id="controls">
+    <div id="error-message" style="display:none; color:#f87171; font-size:12px; text-align:center; width:100%;"></div>
+    <div id="stake-row" style="display:flex; align-items:center; gap:8px;">
+      <label style="color:#666; font-size:12px;">Stake £</label>
+      <input type="number" id="stake-input" value="10" min="0.10" max="500" step="0.10"
+        style="width:80px; background:#111; border:1px solid #2a2a2a; border-radius:4px; color:#fff; padding:4px 8px; font-size:13px;">
+    </div>
+    <button id="btn-fight" disabled>⚔️ FIGHT</button>
+    <button id="btn-reset">↺ NEW</button>
+  </div>
+  <input type="text" id="seed-input" placeholder="Seed (auto-generated)" style="display:none;" />
+</div>
+
+<div id="paytable-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1000; align-items:center; justify-content:center;">
+  <div style="background:#0f0f1a; border:1px solid #2a2a3a; border-radius:12px; padding:24px; max-width:480px; width:90%; max-height:80vh; overflow-y:auto; color:#fff; font-family:system-ui;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h2 style="font-size:16px; font-weight:700;">⚔️ Arena Ball Fight — Paytable</h2>
+      <button id="btn-close-paytable" style="background:none; border:none; color:#666; font-size:18px; cursor:pointer;">✕</button>
+    </div>
+    
+    <div style="margin-bottom:16px; padding:10px; background:#1a1a2e; border-radius:8px;">
+      <div style="font-size:13px; color:#4ade80; font-weight:700; margin-bottom:4px;">RTP: 95.00%</div>
+      <div style="font-size:11px; color:#888;">For every £100 wagered, £95 is returned to players on average.</div>
+    </div>
+
+    <h3 style="font-size:12px; color:#888; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">Win Tiers</h3>
+    <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:16px;">
+      <thead>
+        <tr style="color:#666; border-bottom:1px solid #2a2a2a;">
+          <th style="text-align:left; padding:6px 4px;">Outcome</th>
+          <th style="text-align:left; padding:6px 4px;">Condition</th>
+          <th style="text-align:right; padding:6px 4px;">Multiplier</th>
+          <th style="text-align:right; padding:6px 4px;">Example (£10)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #1a1a1a;">
+          <td style="padding:6px 4px;">💥 Obliterate</td>
+          <td style="padding:6px 4px;">Win with &gt;60% HP</td>
+          <td style="text-align:right; color:#4ade80;">2.19× odds</td>
+          <td style="text-align:right; color:#4ade80;">up to £41.61</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1a1a1a;">
+          <td style="padding:6px 4px;">⚔️ Close Call</td>
+          <td style="padding:6px 4px;">Win with 20-60% HP</td>
+          <td style="text-align:right; color:#4ade80;">0.95× odds</td>
+          <td style="text-align:right; color:#4ade80;">up to £18.05</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1a1a1a;">
+          <td style="padding:6px 4px;">😅 Clutch</td>
+          <td style="padding:6px 4px;">Win with &lt;20% HP</td>
+          <td style="text-align:right; color:#4ade80;">0.67× odds</td>
+          <td style="text-align:right; color:#4ade80;">up to £12.73</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 4px;">💀 Defeated</td>
+          <td style="padding:6px 4px;">Lose</td>
+          <td style="text-align:right; color:#666;">—</td>
+          <td style="text-align:right; color:#666;">£0</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:12px; color:#888; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">Matchup Odds</h3>
+    <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:16px;">
+      <thead>
+        <tr style="color:#666; border-bottom:1px solid #2a2a2a;">
+          <th style="text-align:left; padding:6px 4px;">Matchup</th>
+          <th style="text-align:right; padding:6px 4px;">Fighter A odds</th>
+          <th style="text-align:right; padding:6px 4px;">Fighter B odds</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #1a1a1a;">
+          <td style="padding:6px 4px;">🔴 Blaze vs 🟤 Quake</td>
+          <td style="text-align:right; color:#4ade80;">1.78×</td>
+          <td style="text-align:right; color:#4ade80;">2.04×</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1a1a1a;">
+          <td style="padding:6px 4px;">🔴 Blaze vs ⚡ Spark</td>
+          <td style="text-align:right; color:#4ade80;">2.47×</td>
+          <td style="text-align:right; color:#4ade80;">1.54×</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1a1a1a;">
+          <td style="padding:6px 4px;">🔴 Blaze vs 👻 Phantom</td>
+          <td style="text-align:right; color:#4ade80;">1.92×</td>
+          <td style="text-align:right; color:#4ade80;">1.88×</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1a1a1a;">
+          <td style="padding:6px 4px;">🟤 Quake vs ⚡ Spark</td>
+          <td style="text-align:right; color:#4ade80;">1.52×</td>
+          <td style="text-align:right; color:#4ade80;">2.52×</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1a1a1a;">
+          <td style="padding:6px 4px;">🟤 Quake vs 👻 Phantom</td>
+          <td style="text-align:right; color:#4ade80;">1.37×</td>
+          <td style="text-align:right; color:#4ade80;">3.09×</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 4px;">⚡ Spark vs 👻 Phantom</td>
+          <td style="text-align:right; color:#4ade80;">2.49×</td>
+          <td style="text-align:right; color:#4ade80;">1.54×</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:12px; color:#888; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">How to Play</h3>
+    <ol style="font-size:12px; color:#aaa; line-height:1.8; padding-left:16px; margin-bottom:16px;">
+      <li>Pick your fighter</li>
+      <li>Set your stake (£0.10 – £500)</li>
+      <li>Hit FIGHT — your opponent is randomly assigned</li>
+      <li>Watch the battle play out</li>
+      <li>Win your stake × odds if your fighter wins</li>
+    </ol>
+
+    <h3 style="font-size:12px; color:#888; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">Provably Fair</h3>
+    <p style="font-size:11px; color:#666; line-height:1.6;">Every fight outcome is determined by a cryptographic seed committed before your bet. After the fight, the seed is revealed — you can verify the result independently using SHA-256.</p>
+
+    <div style="margin-top:16px; padding:8px; background:#1a1a2e; border-radius:6px; font-size:10px; color:#555; text-align:center;">
+      Min stake: £0.10 &nbsp;|&nbsp; Max stake: £500 &nbsp;|&nbsp; RTP: 95% &nbsp;|&nbsp; House edge: 5%
+    </div>
+  </div>
+</div>
+
+<script type="module" src="src/game.js"></script>
+</body>
+</html>

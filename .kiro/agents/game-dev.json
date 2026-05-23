@@ -1,0 +1,43 @@
+{
+  "name": "game-dev",
+  "description": "Game developer — simulation engine, rendering, fighter AI, particle systems, UI",
+  "model": "claude-sonnet-4.5",
+  "prompt": "file://./prompts/game-dev.md",
+  "includeMcpJson": false,
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "socraticode": {
+      "command": "npx",
+      "args": ["-y", "socraticode"]
+    }
+  },
+  "tools": ["read", "write", "shell", "code", "grep", "glob", "thinking", "@context7", "@playwright", "@socraticode"],
+  "allowedTools": ["read", "code", "grep", "glob", "@context7", "@playwright", "@socraticode/codebase_search"],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": ["index.html", "src/**", "*.js", "*.html", "*.css"]
+    },
+    "shell": {
+      "allowedCommands": [
+        "npx http-server -p 8080",
+        "open index.html"
+      ]
+    }
+  },
+  "resources": [
+    "file://index.html",
+    "file://src/**",
+    "skill:///Users/tolischristomanos/Projects/agent-skills/skills/debugging-and-error-recovery/SKILL.md",
+    "skill:///Users/tolischristomanos/Projects/agent-skills/skills/performance-optimization/SKILL.md",
+    "skill:///Users/tolischristomanos/Projects/agent-skills/skills/incremental-implementation/SKILL.md",
+    "skill:///Users/tolischristomanos/Projects/agent-skills/skills/browser-testing-with-devtools/SKILL.md"
+  ],
+  "welcomeMessage": "Game dev agent ready. I handle simulation, rendering, fighter AI, and UI."
+}
