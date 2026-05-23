@@ -1,13 +1,12 @@
 /**
- * Generate Stake Engine Math Upload Files
+ * Generate Stake Engine Math Upload Files (Per-Fighter Modes)
  * 
- * Produces:
- * - index.json (mode declarations)
- * - lookUpTable_base.csv (simulation_number, probability, payout_multiplier)
- * - base_events.jsonl (game outcomes, to be compressed with zstd)
+ * Produces 4 modes (one per fighter choice), each with:
+ * - CSV lookup table
+ * - Compressed JSONL game events
  * 
- * Usage: node scripts/generate-math-upload.js [num_simulations]
- * Then:  cd dist/math && zstd base_events.jsonl
+ * Usage: node scripts/generate-math-upload.js [sims_per_mode]
+ * Default: 100,000 per mode (400k total)
  */
 import { BattleSimulation } from '../src/core/simulation.js';
 import { calcPayout, getTier } from '../server/payout.js';
@@ -16,7 +15,7 @@ import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { execSync } from 'child_process';
 import crypto from 'crypto';
 
-const NUM_SIMS = parseInt(process.argv[2]) || 100_000;
+const SIMS_PER_MODE = parseInt(process.argv[2]) || 100_000;
 const OUTPUT_DIR = 'dist/math';
 const HOUSE_EDGE = 0.05;
 const FIGHTERS = ['blaze', 'quake', 'spark', 'phantom'];
@@ -34,107 +33,97 @@ function getMatchupKey(a, b) {
   return [a, b].sort().join(':');
 }
 
-if (!existsSync(OUTPUT_DIR)) mkdirSync(OUTPUT_DIR, { recursive: true });
+if (existsSync(OUTPUT_DIR)) execSync(`rm -rf ${OUTPUT_DIR}`);
+mkdirSync(OUTPUT_DIR, { recursive: true });
 
-console.log(`\n🎰 Generating ${NUM_SIMS.toLocaleString()} simulations for Stake Engine...\n`);
+console.log(`\n🎰 Generating ${SIMS_PER_MODE.toLocaleString()} simulations × 4 fighters = ${(SIMS_PER_MODE * 4).toLocaleString()} total\n`);
 
-const events = [];
-const csvRows = [];
+const modes = [];
 
-// Probability per simulation (uniform for now — each outcome equally likely to be selected)
-// Stake Engine uses uint64 probabilities that sum to a large number
-// We use uniform weighting: each sim has probability 1/NUM_SIMS
-// Represented as integer: total_weight / NUM_SIMS per sim
-const TOTAL_WEIGHT = BigInt(NUM_SIMS) * 1000000n; // large integer for precision
-const PER_SIM_WEIGHT = TOTAL_WEIGHT / BigInt(NUM_SIMS);
-
-for (let i = 0; i < NUM_SIMS; i++) {
-  // Generate deterministic seed
-  const seed = crypto.randomBytes(16).toString('hex');
+for (const playerFighter of FIGHTERS) {
+  console.log(`  ⚔️  Mode: ${playerFighter}`);
   
-  // Random player fighter and opponent
-  const playerFighter = FIGHTERS[i % FIGHTERS.length];
   const opponents = FIGHTERS.filter(f => f !== playerFighter);
-  const opponent = opponents[Math.floor(Math.random() * opponents.length)];
+  const events = [];
+  const csvRows = [];
+  const PER_SIM_WEIGHT = 1000000n; // uniform weight
 
-  // Get odds for this matchup
-  const key = getMatchupKey(playerFighter, opponent);
-  const probs = MATCHUP_PROBS[key];
-  const playerWinProb = probs[playerFighter];
-  const playerOdds = oddsForFighter(playerWinProb, HOUSE_EDGE);
+  for (let i = 0; i < SIMS_PER_MODE; i++) {
+    const seed = crypto.randomBytes(16).toString('hex');
+    
+    // Cycle through opponents evenly
+    const opponent = opponents[i % opponents.length];
 
-  // Run simulation
-  const sim = new BattleSimulation(seed, [playerFighter, opponent]);
-  const result = sim.runAll();
+    // Get odds
+    const key = getMatchupKey(playerFighter, opponent);
+    const probs = MATCHUP_PROBS[key];
+    const playerWinProb = probs[playerFighter];
+    const playerOdds = oddsForFighter(playerWinProb, HOUSE_EDGE);
 
-  // Determine outcome
-  const winnerName = result.winner?.id || result.winner?.type;
-  const playerWon = winnerName === playerFighter;
+    // Run simulation
+    const sim = new BattleSimulation(seed, [playerFighter, opponent]);
+    const result = sim.runAll();
 
-  let payoutMultiplier = 0; // integer: 0 = loss, 100 = 1.00x
-  let tier = null;
+    const winnerName = result.winner?.id || result.winner?.type;
+    const playerWon = winnerName === playerFighter;
 
-  if (playerWon) {
-    const hpPct = result.winner.hp / result.winner.maxHp;
-    const payout = calcPayout(1, playerOdds, hpPct); // stake=1 to get multiplier
-    payoutMultiplier = Math.round(payout * 100); // integer representation (100 = 1x)
-    tier = getTier(hpPct);
+    let payoutMultiplier = 0;
+    let tier = null;
+
+    if (playerWon) {
+      const hpPct = result.winner.hp / result.winner.maxHp;
+      const payout = calcPayout(1, playerOdds, hpPct);
+      payoutMultiplier = Math.round(payout * 100);
+      tier = getTier(hpPct);
+    }
+
+    events.push(JSON.stringify({
+      id: i + 1,
+      events: [{
+        seed,
+        fighterA: playerFighter,
+        fighterB: opponent,
+        winner: playerWon ? playerFighter : opponent,
+        winnerHpPct: result.winner ? result.winner.hp / result.winner.maxHp : 0,
+        tier: tier?.label || null,
+        totalFrames: result.totalFrames,
+      }],
+      payoutMultiplier,
+    }));
+
+    csvRows.push(`${i + 1},${PER_SIM_WEIGHT},${payoutMultiplier}`);
+
+    if ((i + 1) % 25000 === 0) process.stdout.write(`\r    Progress: ${i + 1}/${SIMS_PER_MODE}`);
   }
 
-  // Event data (what the /play API returns to the frontend)
-  const event = {
-    id: i + 1,
-    events: [{
-      seed,
-      fighterA: playerFighter,
-      fighterB: opponent,
-      winner: playerWon ? playerFighter : opponent,
-      winnerHpPct: result.winner ? result.winner.hp / result.winner.maxHp : 0,
-      tier: tier?.label || null,
-      totalFrames: result.totalFrames,
-    }],
-    payoutMultiplier,
-  };
+  console.log(`\r    ✅ ${SIMS_PER_MODE.toLocaleString()} simulations done`);
 
-  events.push(JSON.stringify(event));
+  // Write JSONL
+  const jsonlFile = `${playerFighter}_events.jsonl`;
+  writeFileSync(`${OUTPUT_DIR}/${jsonlFile}`, events.join('\n') + '\n');
 
-  // CSV row: simulation_number, probability (uint64), payout_multiplier
-  csvRows.push(`${i + 1},${PER_SIM_WEIGHT},${payoutMultiplier}`);
+  // Compress
+  try {
+    execSync(`zstd --rm -f ${OUTPUT_DIR}/${jsonlFile}`, { stdio: 'pipe' });
+  } catch {
+    console.log(`    ⚠️  zstd failed — compress manually`);
+  }
 
-  if ((i + 1) % 10000 === 0) process.stdout.write(`\r  Progress: ${i + 1}/${NUM_SIMS}`);
-}
+  // Write CSV
+  const csvFile = `lookUpTable_${playerFighter}.csv`;
+  writeFileSync(`${OUTPUT_DIR}/${csvFile}`, csvRows.join('\n') + '\n');
 
-console.log('\n\n  Writing files...');
-
-// Write JSONL
-const jsonlPath = `${OUTPUT_DIR}/base_events.jsonl`;
-writeFileSync(jsonlPath, events.join('\n') + '\n');
-console.log(`  ✅ ${jsonlPath} (${events.length} events)`);
-
-// Write CSV
-const csvPath = `${OUTPUT_DIR}/lookUpTable_base.csv`;
-writeFileSync(csvPath, csvRows.join('\n') + '\n');
-console.log(`  ✅ ${csvPath}`);
-
-// Compress with zstd
-try {
-  execSync(`zstd --rm -f ${jsonlPath}`, { stdio: 'pipe' });
-  console.log(`  ✅ ${jsonlPath}.zst (compressed)`);
-} catch (e) {
-  console.log(`  ⚠️  zstd compression failed — compress manually: zstd ${jsonlPath}`);
+  modes.push({
+    name: playerFighter,
+    cost: 1.0,
+    events: `${jsonlFile}.zst`,
+    weights: csvFile,
+  });
 }
 
 // Write index.json
-const index = {
-  modes: [{
-    name: 'base',
-    cost: 1.0,
-    events: 'base_events.jsonl.zst',
-    weights: 'lookUpTable_base.csv',
-  }],
-};
-writeFileSync(`${OUTPUT_DIR}/index.json`, JSON.stringify(index, null, 2) + '\n');
-console.log(`  ✅ ${OUTPUT_DIR}/index.json`);
+writeFileSync(`${OUTPUT_DIR}/index.json`, JSON.stringify({ modes }, null, 2) + '\n');
 
-console.log(`\n✅ Math upload folder ready at: ${OUTPUT_DIR}/`);
-console.log(`   Upload this folder via the "Math" button in Stake Engine ACP.\n`);
+console.log(`\n✅ Math upload folder ready: ${OUTPUT_DIR}/`);
+console.log(`   Modes: ${FIGHTERS.join(', ')}`);
+console.log(`   Frontend sends mode: client.Play({ amount, mode: '<fighter_name>' })\n`);

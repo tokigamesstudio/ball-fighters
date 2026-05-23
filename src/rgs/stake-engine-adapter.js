@@ -66,6 +66,7 @@ export class StakeEngineAdapter extends RGSAdapter {
   }
 
   async play(amount, mode, options) {
+    // mode = fighter name (blaze, quake, spark, phantom)
     const { balance, round } = await this._client.Play({ amount, mode });
     this._balance = balance;
 

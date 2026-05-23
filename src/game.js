@@ -123,7 +123,7 @@ async function startBattle() {
 
   let playResult;
   try {
-    playResult = await rgs.play(amount, 'base', { fighterChoice: selectedFighter });
+    playResult = await rgs.play(amount, selectedFighter, { fighterChoice: selectedFighter });
   } catch (err) {
     if (err.message.includes('nsufficient') || err.message.includes('balance')) {
       updateBalanceDisplay();
