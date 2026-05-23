@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 export function createFighter(W, H, config = {}) {
-  const hp = config.hp ?? 85.22;
+  const hp = config.hp ?? 72.44;
   return {
     id: 'quake', name: 'Quake', emoji: '🪨', type: 'quake',
     color: '#8B4513', colorAlt: '#A0522D', glow: 'rgba(139,69,19,0.6)',
@@ -17,7 +17,7 @@ export function createFighter(W, H, config = {}) {
     _config: {
       skillCooldown: config.skillCooldown ?? 112.60,
       shockwaveRange: config.shockwaveRange ?? 221.58,
-      shockwaveDamage: config.shockwaveDamage ?? 35.00,
+      shockwaveDamage: config.shockwaveDamage ?? 32.16,
       shockwaveRepulsion: config.shockwaveRepulsion ?? 7,
       projectileInterval: config.projectileInterval ?? 85,
       projectileDamage: config.projectileDamage ?? 10,

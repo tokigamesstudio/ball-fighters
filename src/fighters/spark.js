@@ -15,7 +15,7 @@ export function createFighter(W, H, config = {}) {
     _erraticTimer: 0,
     _config: {
       skillCooldown: config.skillCooldown ?? 90.51,
-      boltDamage: config.boltDamage ?? 24.00,
+      boltDamage: config.boltDamage ?? 21.84,
       boltSpeed: config.boltSpeed ?? 11,
       boltLife: config.boltLife ?? 100,
       directionChangeInterval: config.directionChangeInterval ?? 56.06,

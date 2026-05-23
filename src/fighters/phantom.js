@@ -18,7 +18,7 @@ export function createFighter(W, H, config = {}) {
       skillCooldown: config.skillCooldown ?? 200.00,
       teleportPrediction: config.teleportPrediction ?? 40,
       dashPower: config.dashPower ?? 9.00,
-      boltDamage: config.boltDamage ?? 26.83,
+      boltDamage: config.boltDamage ?? 22.81,
       skillBoltSpeed: config.skillBoltSpeed ?? 8,
       projectileInterval: config.projectileInterval ?? 100,
       projectileSpeed: config.projectileSpeed ?? 6,

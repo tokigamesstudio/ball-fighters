@@ -1,9 +1,9 @@
 // Tiered payout multipliers — calibrated for 95% RTP
-// Win distribution: obliterate 9.3%, close 50.4%, clutch 40.3% (of wins)
+// Win distribution: obliterate 7.5%, close 49.3%, clutch 43.1% (of wins)
 export const TIERS = {
-  obliterate: { hpThreshold: 0.6, multiplier: 2.19, label: 'Obliterate', narrative: 'Dominant victory! Opponent destroyed.' },
-  close:      { hpThreshold: 0.2, multiplier: 0.95, label: 'Close Call',  narrative: 'Close call! Hard-fought win.' },
-  clutch:     { hpThreshold: 0,   multiplier: 0.67, label: 'Clutch',      narrative: 'Clutch win! Barely survived.' },
+  obliterate: { hpThreshold: 0.6, multiplier: 2.38, label: 'Obliterate', narrative: 'Dominant victory! Opponent destroyed.' },
+  close:      { hpThreshold: 0.2, multiplier: 1.03, label: 'Close Call',  narrative: 'Close call! Hard-fought win.' },
+  clutch:     { hpThreshold: 0,   multiplier: 0.73, label: 'Clutch',      narrative: 'Clutch win! Barely survived.' },
 };
 
 export function calcPayout(stake, odds, winnerHpPct) {

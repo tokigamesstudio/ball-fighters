@@ -11,7 +11,7 @@ const W = 600, H = 600;
 // ── 1. Correct HP ──────────────────────────────────────────────────────────
 describe('createFighter — HP', () => {
   it('blaze has 73.11 hp', () => expect(createBlaze(W, H).hp).toBe(73.11));
-  it('quake has 85.22 hp', () => expect(createQuake(W, H).hp).toBe(85.22));
+  it('quake has 72.44 hp', () => expect(createQuake(W, H).hp).toBe(72.44));
   it('spark has 84.63 hp', () => expect(createSpark(W, H).hp).toBe(84.63));
   it('phantom has 82.64 hp', () => expect(createPhantom(W, H).hp).toBe(82.64));
 });

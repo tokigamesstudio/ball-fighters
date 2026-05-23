@@ -17,7 +17,7 @@ export function createFighter(W, H, config = {}) {
     _config: {
       skillCooldown: config.skillCooldown ?? 150.00,
       impulsePower: config.impulsePower ?? 2.92,
-      fireTrailDamage: config.fireTrailDamage ?? 3.80,
+      fireTrailDamage: config.fireTrailDamage ?? 3.46,
       fireTrailLife: config.fireTrailLife ?? 180,
       fireTrailRadius: config.fireTrailRadius ?? 32,
       passiveTrailInterval: config.passiveTrailInterval ?? 40,
