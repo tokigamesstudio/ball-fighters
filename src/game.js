@@ -1,8 +1,9 @@
 import { BattleSimulation } from './core/simulation.js';
 import { renderFrame, resetCracks, resetExplosions } from './rendering/renderer.js';
 import { updateHPBars, updateKillFeed, showWinner, updateTimer } from './rendering/drawUI.js';
+import { createRGSAdapter } from './rgs/index.js';
 
-const SERVER_URL = 'http://localhost:4001';
+const rgs = createRGSAdapter();
 
 const canvas = document.getElementById('arena');
 const ctx = canvas.getContext('2d');
@@ -21,6 +22,8 @@ let slowMotion = 0;
 let selectedFighter = null;
 let opponentFighter = null;
 let deathHoldFrames = 0;
+let rgsConfig = null;
+let jurisdictionFlags = null;
 
 const fighterColors = {
   blaze: '#ff4400',
@@ -29,19 +32,9 @@ const fighterColors = {
   phantom: '#9B59B6'
 };
 
-function generateSeed() {
-  return Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
-}
-
 function showErrorMessage(msg) {
   const el = document.getElementById('error-message');
   if (el) { el.textContent = msg; el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 4000); }
-}
-
-function getOrCreatePlayerId() {
-  let id = localStorage.getItem('arena_player_id');
-  if (!id) { id = 'player_' + Math.random().toString(36).slice(2); localStorage.setItem('arena_player_id', id); }
-  return id;
 }
 
 function playback() {
@@ -50,7 +43,7 @@ function playback() {
       playing = false;
       showWinner(currentResult);
       document.getElementById('btn-reset').style.display = 'block';
-      fetchBalance();
+      updateBalanceDisplay();
     }
     return;
   }
@@ -119,52 +112,52 @@ async function startBattle() {
   document.getElementById('btn-fight').style.display = 'none';
   document.getElementById('btn-reset').style.display = 'block';
 
-  const stake = parseFloat(document.getElementById('stake-input').value) || 10;
-  // Immediately show deducted balance for anticipation
-  const currentBalance = parseFloat(document.getElementById('balance-display').textContent.replace('£','')) || 0;
-  document.getElementById('balance-display').textContent = `£${(currentBalance - stake).toFixed(2)}`;
+  const stakeInput = parseFloat(document.getElementById('stake-input').value) || 10;
+  const amount = rgs.parseAmount(stakeInput);
 
-  let serverResult;
+  // Immediately show deducted balance for anticipation
+  const currentBalance = rgs.getBalance();
+  if (currentBalance) {
+    document.getElementById('balance-display').textContent = rgs.formatAmount(currentBalance.amount - amount);
+  }
+
+  let playResult;
   try {
-    const res = await fetch(`${SERVER_URL}/slot/play`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionToken: getOrCreatePlayerId(),
-        fighterChoice: selectedFighter,
-        stake
-      })
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      if (res.status === 402) {
-        fetchBalance(); // restore correct balance display
-        showErrorMessage('Insufficient balance. Please reduce your stake.');
-      } else {
-        showErrorMessage(body.error || 'Something went wrong. Please try again.');
-      }
-      document.getElementById('btn-reset').style.display = 'block';
-      return;
-    }
-    serverResult = await res.json();
+    playResult = await rgs.play(amount, 'base', { fighterChoice: selectedFighter });
   } catch (err) {
-    showErrorMessage('Could not connect to server. Please try again.');
+    if (err.message.includes('nsufficient') || err.message.includes('balance')) {
+      updateBalanceDisplay();
+      showErrorMessage('Insufficient balance. Please reduce your stake.');
+    } else {
+      showErrorMessage(err.message || 'Something went wrong. Please try again.');
+    }
     document.getElementById('btn-reset').style.display = 'block';
     return;
   }
 
-  // Server determined the seed and opponent — play it back locally
-  const seed = serverResult.seed;
-  const fighterA = serverResult.fighterA;
-  const fighterB = serverResult.fighterB;
-  document.getElementById('seed-input').value = seed;
+  // Update balance display
+  document.getElementById('balance-display').textContent = rgs.formatAmount(playResult.balance.amount);
+
+  // Extract game state from round
+  const state = playResult.round.state || {};
+  const seed = state.seed;
+  const fighterA = state.fighterA || selectedFighter;
+  const fighterB = state.fighterB;
+  document.getElementById('seed-input').value = seed || '';
+
+  // End round if active
+  if (playResult.round.active) {
+    await rgs.endRound();
+  }
 
   requestAnimationFrame(() => {
     const sim = new BattleSimulation(seed, [fighterA, fighterB]);
     const result = sim.runAll();
     
     // Attach server payout info to result for display
-    result.serverResult = serverResult;
+    result.serverResult = state;
+    result.serverResult.payout = playResult.round.payout / 1_000_000;
+    result.serverResult.payoutMultiplier = playResult.round.payoutMultiplier;
     
     currentResult = result;
     frames = result.frames;
@@ -273,20 +266,44 @@ document.querySelectorAll('#speed-controls button').forEach(btn => {
 document.addEventListener('keydown', e => {
   if (e.key === ' ' || e.key === 'Enter') {
     e.preventDefault();
+    if (jurisdictionFlags?.disabledSpacebar) return;
     if (selectedFighter && !playing) {
       startBattle();
     }
   }
 });
 
-async function fetchBalance() {
-  try {
-    const res = await fetch(`${SERVER_URL}/balance?token=${getOrCreatePlayerId()}`);
-    if (!res.ok) return;
-    const { balance } = await res.json();
-    document.getElementById('balance-display').textContent = `£${Number(balance).toFixed(2)}`;
-  } catch {}
+function updateBalanceDisplay() {
+  const balance = rgs.getBalance();
+  if (balance) {
+    document.getElementById('balance-display').textContent = rgs.formatAmount(balance.amount);
+  }
 }
+
+async function initRGS() {
+  try {
+    const authResult = await rgs.authenticate();
+    rgsConfig = authResult.config;
+    jurisdictionFlags = authResult.jurisdictionFlags;
+    document.getElementById('balance-display').textContent = rgs.formatAmount(authResult.balance.amount);
+
+    // Resume interrupted round
+    if (authResult.activeRound) {
+      await rgs.endRound();
+      updateBalanceDisplay();
+    }
+  } catch (err) {
+    showErrorMessage('Could not connect to game server.');
+  }
+}
+
+// Listen for balance updates (Stake Engine emits these on window)
+window.addEventListener('balanceUpdate', (event) => {
+  const detail = event.detail;
+  if (detail) {
+    document.getElementById('balance-display').textContent = rgs.formatAmount(detail.amount);
+  }
+});
 
 // Share button - copy replay URL to clipboard
 document.getElementById('btn-share').addEventListener('click', async () => {
@@ -336,4 +353,4 @@ if (urlParams.has('seed') && urlParams.has('a')) {
 }
 
 // Load balance on startup
-fetchBalance();
+initRGS();
