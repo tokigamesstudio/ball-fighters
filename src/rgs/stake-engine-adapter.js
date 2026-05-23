@@ -20,9 +20,7 @@ export class StakeEngineAdapter extends RGSAdapter {
   }
 
   async authenticate() {
-    // Import from esm.sh CDN (bundles all dependencies for browser use)
-    const mod = await import('https://esm.sh/stake-engine@0.1.32');
-    const { RGSClient, DisplayAmount } = mod;
+    const { RGSClient, DisplayAmount } = await import('./stake-engine.bundle.js');
     this._DisplayAmount = DisplayAmount;
 
     this._client = RGSClient({
