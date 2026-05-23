@@ -10,28 +10,22 @@
  */
 import { BattleSimulation } from '../src/core/simulation.js';
 import { calcPayout, getTier } from '../server/payout.js';
-import { oddsForFighter } from '../server/odds.js';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { execSync } from 'child_process';
 import crypto from 'crypto';
 
 const SIMS_PER_MODE = parseInt(process.argv[2]) || 100_000;
 const OUTPUT_DIR = 'dist/math';
-const HOUSE_EDGE = 0.05;
 const FIGHTERS = ['blaze', 'quake', 'spark', 'phantom'];
 
-const MATCHUP_PROBS = {
-  'blaze:quake':   { blaze: 0.545, quake: 0.455 },
-  'blaze:spark':   { blaze: 0.402, spark: 0.598 },
-  'blaze:phantom': { blaze: 0.490, phantom: 0.510 },
-  'quake:spark':   { quake: 0.489, spark: 0.511 },
-  'phantom:quake': { phantom: 0.370, quake: 0.630 },
-  'phantom:spark': { phantom: 0.587, spark: 0.413 },
+// Per-mode flat odds calibrated for 95% RTP
+// Derived from: 0.95 / (actualWinRate * avgTierMultiplier)
+const MODE_ODDS = {
+  blaze: 2.43,
+  quake: 1.73,
+  spark: 1.77,
+  phantom: 1.80,
 };
-
-function getMatchupKey(a, b) {
-  return [a, b].sort().join(':');
-}
 
 if (existsSync(OUTPUT_DIR)) execSync(`rm -rf ${OUTPUT_DIR}`);
 mkdirSync(OUTPUT_DIR, { recursive: true });
@@ -54,11 +48,8 @@ for (const playerFighter of FIGHTERS) {
     // Cycle through opponents evenly
     const opponent = opponents[i % opponents.length];
 
-    // Get odds
-    const key = getMatchupKey(playerFighter, opponent);
-    const probs = MATCHUP_PROBS[key];
-    const playerWinProb = probs[playerFighter];
-    const playerOdds = oddsForFighter(playerWinProb, HOUSE_EDGE);
+    // Flat odds for this mode (calibrated for 95% RTP)
+    const playerOdds = MODE_ODDS[playerFighter];
 
     // Run simulation
     const sim = new BattleSimulation(seed, [playerFighter, opponent]);
