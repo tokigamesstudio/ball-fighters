@@ -57,4 +57,10 @@
 	}
 	.emoji { font-size: 1.5rem; }
 	.name { font-size: 0.8rem; font-weight: 600; }
+
+	@media (max-height: 500px) {
+		.fighter-card { padding: 0.4rem 0.6rem; }
+		.emoji { font-size: 1rem; }
+		.name { font-size: 0.7rem; }
+	}
 </style>

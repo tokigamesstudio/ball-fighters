@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { RGSRoundState } from '$rgs';
 
 	interface Props {
@@ -13,6 +14,24 @@
 
 	const playerWon = $derived(round.winner === round.playerBet);
 	const winAmount = $derived(round.payout * 1_000_000);
+
+	// Count-up animation
+	let displayedAmount = $state(0);
+
+	onMount(() => {
+		if (!playerWon || winAmount <= 0) return;
+		const duration = 1200;
+		const start = performance.now();
+		function tick() {
+			const elapsed = performance.now() - start;
+			const progress = Math.min(elapsed / duration, 1);
+			// Ease out cubic
+			const eased = 1 - Math.pow(1 - progress, 3);
+			displayedAmount = winAmount * eased;
+			if (progress < 1) requestAnimationFrame(tick);
+		}
+		requestAnimationFrame(tick);
+	});
 </script>
 
 {#if winner}
@@ -30,7 +49,7 @@
 
 			<p class="stats">
 				{#if playerWon}
-					{round.narrative ?? ''} • Won {formatAmount(winAmount)}
+					{round.narrative ?? ''} • Won {formatAmount(displayedAmount)}
 				{:else}
 					Better luck next time
 				{/if}

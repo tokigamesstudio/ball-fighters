@@ -8,9 +8,10 @@
 		speed?: number;
 		onComplete?: () => void;
 		onFrame?: (index: number) => void;
+		onHit?: (amount: number) => void;
 	}
 
-	let { frames, playing, speed = 0.4, onComplete, onFrame }: Props = $props();
+	let { frames, playing, speed = 0.4, onComplete, onFrame, onHit }: Props = $props();
 
 	let canvas: HTMLCanvasElement;
 	let app: Application;
@@ -114,6 +115,7 @@
 					t.y = e.y;
 					damageLayer.addChild(t);
 					floatingTexts.push({ text: t, life: 40 });
+					onHit?.(e.amount);
 				}
 			}
 		}
@@ -245,10 +247,12 @@
 <style>
 	.arena-canvas {
 		width: 100%;
+		height: 100%;
 		max-width: 600px;
+		max-height: 600px;
 		aspect-ratio: 1;
 		border-radius: 8px;
 		display: block;
-		margin: 0 auto;
+		object-fit: contain;
 	}
 </style>

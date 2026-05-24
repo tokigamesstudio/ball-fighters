@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { createGameActor } from '$game/machine';
+	import { playBet, playWin, playLose, playHit, playBigHit, isMuted, toggleMute } from '$game/sound.svelte';
 	import { createRGSAdapter, type RGSAdapter } from '$rgs';
 	import Arena from '$components/Arena.svelte';
 	import FighterSelect from '$components/FighterSelect.svelte';
@@ -53,6 +54,7 @@
 	}
 
 	async function handlePlay() {
+		playBet();
 		actor.send({ type: 'PLAY' });
 		const snap = actor.getSnapshot();
 		if (snap.value !== 'betting') return;
@@ -73,9 +75,12 @@
 
 	function handlePlaybackComplete() {
 		actor.send({ type: 'PLAYBACK_COMPLETE' });
-		// Update balance after match ends (no spoiler)
 		const bal = rgs.getBalance();
 		if (bal) balance = rgs.formatAmount(bal.amount);
+		// Play win/lose sound
+		const round = actor.getSnapshot().context.round;
+		if (round && round.winner === round.playerBet) playWin();
+		else playLose();
 	}
 
 	function handlePlayAgain() {
@@ -124,6 +129,7 @@
 	<div class="top-bar">
 		<BalanceBar {balance} stake={stakeDisplay} social={isSocial} />
 		<button class="info-btn" onclick={() => infoOpen = true}>ℹ️</button>
+		<button class="info-btn" onclick={() => toggleMute()}>{isMuted() ? '🔇' : '🔊'}</button>
 	</div>
 
 	{#if isPlaying && frames.length > 0}
@@ -131,7 +137,7 @@
 	{/if}
 
 	<div class="arena-wrapper">
-		<Arena {frames} playing={isPlaying} onComplete={handlePlaybackComplete} onFrame={(i) => currentFrameIndex = i} />
+		<Arena {frames} playing={isPlaying} onComplete={handlePlaybackComplete} onFrame={(i) => currentFrameIndex = i} onHit={(amt) => amt > 15 ? playBigHit() : playHit()} />
 
 		{#if isResult && state.context.round && winnerFighter}
 			<WinnerOverlay
@@ -177,16 +183,17 @@
 	.game-container {
 		max-width: 640px;
 		margin: 0 auto;
-		padding: 1rem;
+		padding: 0.5rem;
 		display: flex;
 		flex-direction: column;
-		gap: 0.75rem;
+		gap: 0.5rem;
 		font-family: system-ui, sans-serif;
 		color: #fff;
-		min-height: 100dvh;
+		height: 100dvh;
 		background: #0f0f1a;
+		overflow: hidden;
 	}
-	.arena-wrapper { position: relative; }
+	.arena-wrapper { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
 	.top-bar { display: flex; gap: 0.5rem; align-items: stretch; }
 	.top-bar :global(:first-child) { flex: 1; }
 	.info-btn {
