@@ -51,12 +51,22 @@ for (const playerFighter of FIGHTERS) {
   // Use continuous HP-based multiplier for payout variety
   // multiplier = baseMin + (hpPct * range), scaled so average = 1.0 for 95% RTP
   // First, calculate raw multipliers
+  // Finishing Move: ~1% of wins with HP > 0.8 get a 50x payout
+  const FINISHING_MOVE_CHANCE = 0.02;
+  const FINISHING_MOVE_MULT = 50;
+  const FINISHING_MOVE_HP_THRESHOLD = 0.6;
+
   const rawMults = [];
+  const finishingMoveFlags = [];
   for (const r of simResults) {
     if (r.playerWon) {
-      // Continuous: higher HP = higher multiplier (0.5x to 3.0x range)
-      const mult = 0.5 + r.hpPct * 2.5;
-      rawMults.push(mult);
+      const isFinisher = r.hpPct > FINISHING_MOVE_HP_THRESHOLD && Math.random() < FINISHING_MOVE_CHANCE;
+      finishingMoveFlags.push(isFinisher);
+      if (isFinisher) {
+        rawMults.push(FINISHING_MOVE_MULT);
+      } else {
+        rawMults.push(0.5 + r.hpPct * 2.5);
+      }
     }
   }
   // odds = 0.95 * N / sum(rawMults)
@@ -69,11 +79,13 @@ for (const playerFighter of FIGHTERS) {
     const r = simResults[i];
     let payoutMultiplier = 0;
     let tier = null;
+    let finishingMove = false;
     if (r.playerWon) {
-      const mult = 0.5 + r.hpPct * 2.5;
+      const mult = rawMults[winIdx];
       const payout = exactOdds * mult;
       payoutMultiplier = Math.max(0, Math.round(payout * 100));
       tier = getTier(r.hpPct);
+      finishingMove = finishingMoveFlags[winIdx];
       winIdx++;
     }
 
@@ -86,6 +98,7 @@ for (const playerFighter of FIGHTERS) {
         winner: r.playerWon ? playerFighter : r.opponent,
         winnerHpPct: r.hpPct,
         tier: tier?.label || null,
+        finishingMove,
         totalFrames: r.totalFrames,
       }],
       payoutMultiplier,
