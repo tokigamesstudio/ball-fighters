@@ -146,9 +146,6 @@ async function startBattle() {
     return;
   }
 
-  // Update balance display
-  document.getElementById('balance-display').textContent = rgs.formatAmount(playResult.balance.amount);
-
   // Extract game state from round
   const state = playResult.round.state || {};
   const seed = state.seed;
