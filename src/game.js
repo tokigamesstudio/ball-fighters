@@ -126,12 +126,6 @@ async function startBattle() {
   const stakeInput = parseFloat(document.getElementById('stake-input').value) || 10;
   const amount = rgs.parseAmount(stakeInput);
 
-  // Immediately show deducted balance for anticipation
-  const currentBalance = rgs.getBalance();
-  if (currentBalance) {
-    document.getElementById('balance-display').textContent = rgs.formatAmount(currentBalance.amount - amount);
-  }
-
   let playResult;
   try {
     playResult = await rgs.play(amount, selectedFighter, { fighterChoice: selectedFighter });
@@ -321,7 +315,7 @@ window.addEventListener('balanceUpdate', (event) => {
 
 // URL parameter handling for replay mode
 const urlParams = new URLSearchParams(window.location.search);
-const isReplay = urlParams.has('replay') || (urlParams.has('seed') && urlParams.has('a') && urlParams.has('b'));
+const isReplay = urlParams.get('replay') === 'true';
 
 if (isReplay) {
   const seed = urlParams.get('seed');

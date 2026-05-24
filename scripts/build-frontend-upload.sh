@@ -1,16 +1,16 @@
 #!/bin/bash
-# Build the frontend upload folder for Stake Engine
+# Build the frontend for upload
 # Usage: ./scripts/build-frontend-upload.sh
 
 set -e
 
 OUTPUT_DIR="dist/frontend"
-rm -rf "$OUTPUT_DIR"
-mkdir -p "$OUTPUT_DIR"
 
-# Copy static frontend files
-cp index.html "$OUTPUT_DIR/"
-cp -r src/ "$OUTPUT_DIR/src/"
+echo "Building SvelteKit frontend..."
+cd frontend && npm run build && cd ..
+
+rm -rf "$OUTPUT_DIR"
+cp -r frontend/build "$OUTPUT_DIR"
 
 echo "✅ Frontend upload folder ready at: $OUTPUT_DIR/"
 echo "   Upload this folder via the 'Front End' button in Stake Engine ACP."
