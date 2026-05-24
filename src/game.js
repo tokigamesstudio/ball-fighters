@@ -308,6 +308,7 @@ async function initRGS() {
 
 // Listen for balance updates (Stake Engine emits these on window)
 window.addEventListener('balanceUpdate', (event) => {
+  if (playing) return; // suppress during match to avoid spoiler
   const detail = event.detail;
   if (detail) {
     document.getElementById('balance-display').textContent = rgs.formatAmount(detail.amount);
