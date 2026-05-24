@@ -18,15 +18,6 @@ const SIMS_PER_MODE = parseInt(process.argv[2]) || 100_000;
 const OUTPUT_DIR = 'dist/math';
 const FIGHTERS = ['blaze', 'quake', 'spark', 'phantom'];
 
-// Per-mode flat odds calibrated for 95% RTP
-// Derived from: 0.95 / (actualWinRate * avgTierMultiplier)
-const MODE_ODDS = {
-  blaze: 2.43,
-  quake: 1.73,
-  spark: 1.77,
-  phantom: 1.80,
-};
-
 if (existsSync(OUTPUT_DIR)) execSync(`rm -rf ${OUTPUT_DIR}`);
 mkdirSync(OUTPUT_DIR, { recursive: true });
 
@@ -42,52 +33,58 @@ for (const playerFighter of FIGHTERS) {
   const csvRows = [];
   const PER_SIM_WEIGHT = 1000000n; // uniform weight
 
+  // Pass 1: simulate and collect raw HP results
+  const simResults = [];
   for (let i = 0; i < SIMS_PER_MODE; i++) {
     const seed = crypto.randomBytes(16).toString('hex');
-    
-    // Cycle through opponents evenly
     const opponent = opponents[i % opponents.length];
-
-    // Flat odds for this mode (calibrated for 95% RTP)
-    const playerOdds = MODE_ODDS[playerFighter];
-
-    // Run simulation
     const sim = new BattleSimulation(seed, [playerFighter, opponent]);
     const result = sim.runAll();
-
     const winnerName = result.winner?.id || result.winner?.type;
     const playerWon = winnerName === playerFighter;
+    const hpPct = playerWon ? result.winner.hp / result.winner.maxHp : 0;
+    simResults.push({ seed, opponent, playerWon, hpPct, totalFrames: result.totalFrames });
+    if ((i + 1) % 50000 === 0) process.stdout.write(`\r    Simulating: ${i + 1}/${SIMS_PER_MODE}`);
+  }
 
+  // Pass 2: calculate exact odds for 95% RTP from this dataset
+  // RTP = (1/N) * sum(playerWon ? odds * tierMult : 0) = 0.95
+  // odds = 0.95 * N / sum(tierMult for wins)
+  let tierMultSum = 0;
+  for (const r of simResults) {
+    if (r.playerWon) tierMultSum += getTier(r.hpPct).multiplier;
+  }
+  const exactOdds = (0.95 * SIMS_PER_MODE) / tierMultSum;
+
+  // Pass 3: write events with exact odds
+  for (let i = 0; i < simResults.length; i++) {
+    const r = simResults[i];
     let payoutMultiplier = 0;
     let tier = null;
-
-    if (playerWon) {
-      const hpPct = result.winner.hp / result.winner.maxHp;
-      const payout = calcPayout(1, playerOdds, hpPct);
+    if (r.playerWon) {
+      const payout = calcPayout(1, exactOdds, r.hpPct);
       payoutMultiplier = Math.round(payout * 100);
-      tier = getTier(hpPct);
+      tier = getTier(r.hpPct);
     }
 
     events.push(JSON.stringify({
       id: i + 1,
       events: [{
-        seed,
+        seed: r.seed,
         fighterA: playerFighter,
-        fighterB: opponent,
-        winner: playerWon ? playerFighter : opponent,
-        winnerHpPct: result.winner ? result.winner.hp / result.winner.maxHp : 0,
+        fighterB: r.opponent,
+        winner: r.playerWon ? playerFighter : r.opponent,
+        winnerHpPct: r.hpPct,
         tier: tier?.label || null,
-        totalFrames: result.totalFrames,
+        totalFrames: r.totalFrames,
       }],
       payoutMultiplier,
     }));
 
     csvRows.push(`${i + 1},${PER_SIM_WEIGHT},${payoutMultiplier}`);
-
-    if ((i + 1) % 25000 === 0) process.stdout.write(`\r    Progress: ${i + 1}/${SIMS_PER_MODE}`);
   }
 
-  console.log(`\r    ✅ ${SIMS_PER_MODE.toLocaleString()} simulations done`);
+  console.log(`\r    ✅ ${SIMS_PER_MODE.toLocaleString()} sims | odds=${exactOdds.toFixed(4)} | RTP=95.00%`);
 
   // Write JSONL
   const jsonlFile = `${playerFighter}_events.jsonl`;
