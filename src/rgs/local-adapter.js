@@ -80,9 +80,11 @@ export class LocalRGSAdapter extends RGSAdapter {
         mode,
         state: {
           winner: data.winner,
+          playerBet: fighterChoice || 'blaze',
           fighterA: data.fighterA,
           fighterB: data.fighterB,
           tier: data.tier,
+          narrative: data.narrative,
           seed: data.seed,
           seedHash: data.seedHash,
         },
