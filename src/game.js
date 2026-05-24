@@ -333,11 +333,7 @@ document.getElementById('btn-share').addEventListener('click', async () => {
   } catch {}
 });
 
-// Verify button - show seed input
-document.getElementById('btn-verify').addEventListener('click', () => {
-  const seedInput = document.getElementById('seed-input');
-  seedInput.style.display = seedInput.style.display === 'none' ? 'block' : 'none';
-});
+// Verify button removed — Stake Engine handles provably fair
 
 // URL parameter handling for replay mode
 const urlParams = new URLSearchParams(window.location.search);
