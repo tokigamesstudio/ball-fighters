@@ -305,33 +305,7 @@ window.addEventListener('balanceUpdate', (event) => {
   }
 });
 
-// Share button - copy replay URL to clipboard
-document.getElementById('btn-share').addEventListener('click', async () => {
-  if (!currentResult || !currentResult.frames || currentResult.frames.length === 0) return;
-  const seed = document.getElementById('seed-input').value;
-  const fighterA = currentResult.frames[0].fighters[0].id || currentResult.frames[0].fighters[0].type;
-  const fighterB = currentResult.frames[0].fighters[1].id || currentResult.frames[0].fighters[1].type;
-  const balance = rgs.getBalance();
-  const params = new URLSearchParams({
-    replay: '1',
-    seed,
-    a: fighterA,
-    b: fighterB,
-  });
-  if (balance?.currency) params.set('currency', balance.currency);
-  const stakeInput = document.getElementById('stake-input');
-  if (stakeInput?.value) params.set('amount', String(rgs.parseAmount(parseFloat(stakeInput.value))));
-
-  const url = `${window.location.origin}${window.location.pathname}?${params}`;
-  
-  try {
-    await navigator.clipboard.writeText(url);
-    const btn = document.getElementById('btn-share');
-    const originalText = btn.textContent;
-    btn.textContent = '✓ Copied!';
-    setTimeout(() => { btn.textContent = originalText; }, 2000);
-  } catch {}
-});
+// Share button removed — Stake Engine handles replays
 
 // Verify button removed — Stake Engine handles provably fair
 
