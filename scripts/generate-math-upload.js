@@ -72,7 +72,7 @@ for (const playerFighter of FIGHTERS) {
     if (r.playerWon) {
       const mult = 0.5 + r.hpPct * 2.5;
       const payout = exactOdds * mult;
-      payoutMultiplier = Math.round(payout * 100);
+      payoutMultiplier = Math.max(0, Math.round(payout * 100));
       tier = getTier(r.hpPct);
       winIdx++;
     }
