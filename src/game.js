@@ -1,6 +1,7 @@
 import { BattleSimulation } from './core/simulation.js';
 import { renderFrame, resetCracks, resetExplosions } from './rendering/renderer.js';
 import { updateHPBars, updateKillFeed, showWinner, updateTimer } from './rendering/drawUI.js';
+import { triggerFinishingMove, resetFinishingMove, drawFinishingMove } from './rendering/finishingMoves.js';
 import { createRGSAdapter } from './rgs/index.js';
 
 const rgs = createRGSAdapter();
@@ -54,6 +55,8 @@ function playback() {
     // Keep rendering last frame
     const fd = frames[frames.length - 1];
     renderFrame(ctx, canvas, fd, currentResult, screenShake, floatingTexts, fd.frame);
+    // Draw finishing move animation on top
+    drawFinishingMove(ctx, canvas.width, canvas.height);
     // Draw progress bar at 100%
     ctx.fillStyle = '#4f46e5';
     ctx.fillRect(0, canvas.height - 2, canvas.width, 2);
@@ -89,6 +92,14 @@ function playback() {
     // Set hold when reaching last frame
     if (playbackFrame === frames.length) {
       deathHoldFrames = 90;
+      // Trigger finishing move animation if applicable
+      if (currentResult?.serverResult?.finishingMove && currentResult.winner) {
+        const winner = frames[frames.length - 1].fighters.find(f => f.alive);
+        if (winner) {
+          triggerFinishingMove(winner.id || winner.type, winner.x, winner.y);
+          deathHoldFrames = 120; // longer hold for finishing move
+        }
+      }
     }
   }
 
@@ -190,6 +201,7 @@ function reset() {
   slowMotion = 0;
   resetCracks();
   resetExplosions();
+  resetFinishingMove();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   // Show fighter select, hide reset button
@@ -237,7 +249,7 @@ document.getElementById('btn-play-again').addEventListener('click', () => {
   frames = []; currentResult = null; playbackFrame = 0; playbackAccum = 0;
   deathHoldFrames = 0; killFeedEntries = []; floatingTexts = []; slowMotion = 0;
   screenShake = { x: 0, y: 0, intensity: 0 };
-  resetExplosions(); resetCracks();
+  resetExplosions(); resetCracks(); resetFinishingMove();
   document.getElementById('winner-overlay').style.display = 'none';
   document.getElementById('kill-feed').innerHTML = '';
   document.getElementById('header').innerHTML = '';
@@ -352,8 +364,7 @@ if (isReplay) {
     screenShake = { x: 0, y: 0, intensity: 0 };
     resetCracks();
     resetExplosions();
-
-    const sim = new BattleSimulation(seed, [fighterA, fighterB]);
+    resetFinishingMove();    const sim = new BattleSimulation(seed, [fighterA, fighterB]);
     const result = sim.runAll();
     currentResult = result;
     frames = result.frames;
