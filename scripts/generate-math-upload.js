@@ -48,23 +48,33 @@ for (const playerFighter of FIGHTERS) {
   }
 
   // Pass 2: calculate exact odds for 95% RTP from this dataset
-  // RTP = (1/N) * sum(playerWon ? odds * tierMult : 0) = 0.95
-  // odds = 0.95 * N / sum(tierMult for wins)
-  let tierMultSum = 0;
+  // Use continuous HP-based multiplier for payout variety
+  // multiplier = baseMin + (hpPct * range), scaled so average = 1.0 for 95% RTP
+  // First, calculate raw multipliers
+  const rawMults = [];
   for (const r of simResults) {
-    if (r.playerWon) tierMultSum += getTier(r.hpPct).multiplier;
+    if (r.playerWon) {
+      // Continuous: higher HP = higher multiplier (0.5x to 3.0x range)
+      const mult = 0.5 + r.hpPct * 2.5;
+      rawMults.push(mult);
+    }
   }
-  const exactOdds = (0.95 * SIMS_PER_MODE) / tierMultSum;
+  // odds = 0.95 * N / sum(rawMults)
+  const rawMultSum = rawMults.reduce((a, b) => a + b, 0);
+  const exactOdds = (0.95 * SIMS_PER_MODE) / rawMultSum;
 
-  // Pass 3: write events with exact odds
+  // Pass 3: write events with continuous payouts
+  let winIdx = 0;
   for (let i = 0; i < simResults.length; i++) {
     const r = simResults[i];
     let payoutMultiplier = 0;
     let tier = null;
     if (r.playerWon) {
-      const payout = calcPayout(1, exactOdds, r.hpPct);
+      const mult = 0.5 + r.hpPct * 2.5;
+      const payout = exactOdds * mult;
       payoutMultiplier = Math.round(payout * 100);
       tier = getTier(r.hpPct);
+      winIdx++;
     }
 
     events.push(JSON.stringify({
