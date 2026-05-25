@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Arena from '$components/Arena.svelte';
+	import HpBars from '$components/HpBars.svelte';
 	// @ts-ignore
 	import { BattleSimulation } from '$core/simulation.js';
 
@@ -8,10 +9,13 @@
 	let frames: any[] = $state([]);
 	let error: string | null = $state(null);
 	let replayData: any = $state(null);
+	let currentFrameIndex = $state(0);
+	let playbackSpeed = $state(0.52);
 
 	// Parse URL params
 	const params = new URLSearchParams(window.location.search);
-	const rgsUrl = params.get('rgs_url') || '';
+	let rgsUrl = params.get('rgs_url') || '';
+	if (rgsUrl && !rgsUrl.startsWith('http')) rgsUrl = `https://${rgsUrl}`;
 	const game = params.get('game') || '';
 	const version = params.get('version') || '1';
 	const mode = params.get('mode') || 'BASE';
@@ -28,8 +32,11 @@
 			if (!res.ok) throw new Error(`Failed to load replay (${res.status})`);
 			replayData = await res.json();
 
-			// Run simulation from state
-			const state = replayData.state;
+			// Normalize state — Stake Engine may return array or nested object
+			const rawState = replayData.state || {};
+			const state = Array.isArray(rawState) ? rawState[0] : (rawState.events?.[0] || rawState);
+			if (!state?.seed) throw new Error('Replay data missing seed');
+
 			const sim = new BattleSimulation(state.seed, [state.fighterA, state.fighterB]);
 			const result = sim.runAll();
 			frames = result.frames;
@@ -63,7 +70,18 @@
 			</div>
 		{/if}
 
-		<Arena {frames} playing={status === 'playing'} onComplete={handleComplete} />
+		{#if status === 'playing' && frames.length > 0}
+			<div class="play-header">
+				<HpBars fighters={frames[currentFrameIndex]?.fighters ?? []} />
+				<div class="speed-controls">
+					<button class="speed-btn" class:active={playbackSpeed === 0.52} onclick={() => playbackSpeed = 0.52}>2x</button>
+					<button class="speed-btn" class:active={playbackSpeed === 1.0} onclick={() => playbackSpeed = 1.0}>4x</button>
+					<button class="speed-btn" class:active={playbackSpeed === 1.5} onclick={() => playbackSpeed = 1.5}>6x</button>
+				</div>
+			</div>
+		{/if}
+
+		<Arena {frames} playing={status === 'playing'} speed={playbackSpeed} onComplete={handleComplete} onFrame={(i) => currentFrameIndex = i} />
 
 		{#if status === 'ready'}
 			<button class="btn-play" onclick={startReplay}>▶ Play</button>
@@ -105,6 +123,18 @@
 		border-radius: 6px;
 		font-size: 0.85rem;
 	}
+	.play-header { display: flex; justify-content: space-between; align-items: center; }
+	.speed-controls { display: flex; gap: 0.25rem; }
+	.speed-btn {
+		padding: 0.2rem 0.5rem;
+		border: 1px solid #444;
+		border-radius: 4px;
+		background: #222;
+		color: #aaa;
+		font-size: 0.7rem;
+		cursor: pointer;
+	}
+	.speed-btn.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
 	.btn-play {
 		width: 100%;
 		padding: 0.75rem;

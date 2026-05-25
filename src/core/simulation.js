@@ -2,7 +2,7 @@
 // SIMULATION ENGINE
 // ═══════════════════════════════════════════════════════════════════════════
 import { createRNG, hashSeed } from './rng.js';
-import { applyBounds, resolveBallCollision, applyFriction, applyGravity } from './physics.js';
+import { applyBounds, resolveBallCollision, applyFriction, applyGravity, capSpeed, enforceConstantSpeed } from './physics.js';
 import { updateProjectiles } from './projectiles.js';
 import * as Blaze from '../fighters/blaze.js';
 import * as Quake from '../fighters/quake.js';
@@ -45,6 +45,17 @@ export class BattleSimulation {
     this.fighters = fighterNames
       ? allFighters.filter(f => fighterNames.includes(f.name)).map(f => f.create(fighterConfigs[f.name] || {}))
       : allFighters.filter(f => defaultFighters.includes(f.name)).map(f => f.create(fighterConfigs[f.name] || {}));
+
+    // Randomize starting positions and directions
+    const pad = 80;
+    for (const f of this.fighters) {
+      f.x = pad + this.rng() * (this.W - pad * 2);
+      f.y = pad + this.rng() * (this.H - pad * 2);
+      const angle = this.rng() * Math.PI * 2;
+      const speed = f._config?.speed ?? 5;
+      f.vx = Math.cos(angle) * speed;
+      f.vy = Math.sin(angle) * speed;
+    }
   }
 
   step() {
@@ -79,7 +90,7 @@ export class BattleSimulation {
 
     // Fire trail damage to non-blaze fighters
     for (const f of alive) {
-      if (f.type === 'blaze') continue;
+      if (f.type === 'blaze' || f.phasing) continue;
       for (const trail of this.fireTrails) {
         const dx = f.x - trail.x, dy = f.y - trail.y;
         const trailRadius = trail.radius || 30;
@@ -97,10 +108,7 @@ export class BattleSimulation {
       }
     }
 
-    // 1. Apply friction to each alive fighter
-    for (const f of alive) {
-      applyFriction(f, 0.998);
-    }
+    // 1. (no friction/cap — constant speed enforced after physics)
 
     // 2. Update each fighter with UNIQUE behavior
     for (const f of alive) {
@@ -133,15 +141,10 @@ export class BattleSimulation {
       f.y += f.vy;
     }
 
-    // 2.5. Apply gravity to each alive fighter
-    for (const f of alive) {
-      applyGravity(f, 0.4);
-    }
-
     // 3. Apply bounds with restitution
     const pad = 50 + this.dangerPad;
     for (const f of alive) {
-      applyBounds(f, this.W, this.H, pad, f._restitution ?? 0.95);
+      applyBounds(f, this.W, this.H, pad, this.rng);
     }
 
     // 4. Ball collision between fighters with damage
@@ -158,14 +161,12 @@ export class BattleSimulation {
         
         // Apply collision damage if collision occurred (equal for all fighters)
         if (collided) {
-          const damage = relSpeed * 0.8;
+          const damage = relSpeed * 0.7;
           if (damage > 0) {
             const variance = 0.8 + this.rng() * 0.4; // 80-120% damage
             const actualDamage = damage * variance;
-            a.hp -= actualDamage;
-            b.hp -= actualDamage;
-            a._lastHitBy = b.id;
-            b._lastHitBy = a.id;
+            if (!a.phasing) { a.hp -= actualDamage; a._lastHitBy = b.id; }
+            if (!b.phasing) { b.hp -= actualDamage; b._lastHitBy = a.id; }
             const mx = (a.x+b.x)/2, my = (a.y+b.y)/2;
             this.frameEvents.push({ type: 'damage', x: a.x, y: a.y - a.size - 5, amount: Math.round(actualDamage), color: '#fff' });
             this.frameEvents.push({ type: 'damage', x: b.x, y: b.y - b.size - 5, amount: Math.round(actualDamage), color: '#fff' });
@@ -188,6 +189,7 @@ export class BattleSimulation {
 
     // Check for death after collisions
     for (const f of alive) {
+      enforceConstantSpeed(f);
       if (f.hp <= 0) {
         f.hp = 0;
         f.alive = false;

@@ -1,30 +1,27 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// QUAKE — Shockwave
+// QUAKE — Shockwave (constant-speed: heavy, shockwave on proximity)
 // ═══════════════════════════════════════════════════════════════════════════
 
 export function createFighter(W, H, config = {}) {
-  const hp = config.hp ?? 72.44;
+  const hp = config.hp ?? 95;
   return {
     id: 'quake', name: 'Quake', emoji: '🪨', type: 'quake',
     color: '#8B4513', colorAlt: '#A0522D', glow: 'rgba(139,69,19,0.6)',
-    x: W - 120, y: 40, vx: -5, vy: 2,
-    hp, maxHp: hp, size: 20, mass: 1, alive: true,
+    x: W - 120, y: H * 0.6, vx: -3, vy: -4,
+    hp, maxHp: hp, size: 20, mass: 1.2, alive: true,
     _lastHitBy: null,
-    _restitution: 0.95,
+    _restitution: 1.0,
     _skillCooldown: 0,
     _projectileTimer: 0,
-    _homingTimer: 0,
     _config: {
-      skillCooldown: config.skillCooldown ?? 112.60,
-      shockwaveRange: config.shockwaveRange ?? 221.58,
-      shockwaveDamage: config.shockwaveDamage ?? 32.16,
-      shockwaveRepulsion: config.shockwaveRepulsion ?? 7,
-      projectileInterval: config.projectileInterval ?? 85,
-      projectileDamage: config.projectileDamage ?? 10,
-      projectileSpeed: config.projectileSpeed ?? 5,
-      homingInterval: config.homingInterval ?? 30,
-      homingForce: config.homingForce ?? 0.4,
-      speedCap: config.speedCap ?? 6
+      speed: config.speed ?? 3.5,
+      skillCooldown: config.skillCooldown ?? 70,
+      shockwaveRange: config.shockwaveRange ?? 150,
+      shockwaveDamage: config.shockwaveDamage ?? 4,
+      shockwaveRepulsion: config.shockwaveRepulsion ?? 2,
+      projectileInterval: config.projectileInterval ?? 55,
+      projectileDamage: config.projectileDamage ?? 3,
+      projectileSpeed: config.projectileSpeed ?? 6,
     }
   };
 }
@@ -37,73 +34,37 @@ export function updateFighter(f, alive, state) {
 
   f._skillCooldown--;
   f._projectileTimer--;
-  f._homingTimer--;
 
-  // Gentle homing every 30f
-  if (f._homingTimer <= 0) {
-    f._homingTimer = f._config.homingInterval;
-    const dx = target.x - f.x, dy = target.y - f.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
-    if (dist > 0) {
-      f.vx += (dx/dist) * f._config.homingForce;
-      f.vy += (dy/dist) * f._config.homingForce;
-    }
-  }
+  const dx = target.x - f.x, dy = target.y - f.y;
+  const dist = Math.sqrt(dx*dx + dy*dy);
 
-  // Skill: shockwave if enemy within 200px
-  if (f._skillCooldown <= 0) {
+  // Skill: shockwave damages and pushes enemy (changes THEIR direction)
+  if (f._skillCooldown <= 0 && dist < f._config.shockwaveRange) {
     f._skillCooldown = f._config.skillCooldown;
-    const dx = target.x - f.x, dy = target.y - f.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
-    
-    if (dist < f._config.shockwaveRange) {
-      // Deal damage (reduced at range, full within 120px)
-      const damageScale = dist < 120 ? 1.0 : 0.6;
-      target.hp -= 10 * damageScale;
+    if (!target.phasing) {
+      target.hp -= f._config.shockwaveDamage;
       target._lastHitBy = 'quake';
-      
-      // Apply repulsion impulse
-      if (dist > 0) {
-        target.vx += (dx/dist) * f._config.shockwaveRepulsion;
-        target.vy += (dy/dist) * f._config.shockwaveRepulsion;
-      }
-      
-      // Visual: spawn ring of particles
-      if (particles) {
-        particles.push({ 
-          x: f.x, y: f.y, vx: 0, vy: 0, 
-          life: 30, maxLife: 30, 
-          color: '#8B4513', size: 40, type: 'ring' 
-        });
-      }
-      if (spawnParticles) spawnParticles(f.x, f.y, '#8B4513', 20, 4, 8);
-      
-      // Emit shockwave event for ground cracks
-      if (frameEvents) {
-        frameEvents.push({ type: 'quakeShockwave', x: f.x, y: f.y, range: f._config.shockwaveRange });
-      }
     }
+    // Push enemy away (their enforceConstantSpeed will normalize after)
+    if (dist > 0) {
+      target.vx += (dx/dist) * f._config.shockwaveRepulsion;
+      target.vy += (dy/dist) * f._config.shockwaveRepulsion;
+    }
+    if (particles) particles.push({ x: f.x, y: f.y, vx: 0, vy: 0, life: 30, maxLife: 30, color: '#8B4513', size: 40, type: 'ring' });
+    if (spawnParticles) spawnParticles(f.x, f.y, '#8B4513', 20, 4, 8);
+    if (frameEvents) frameEvents.push({ type: 'quakeShockwave', x: f.x, y: f.y, range: f._config.shockwaveRange });
   }
 
-  // Between skills: fire slow heavy projectile every 90f
+  // Projectile: rock toward enemy
   if (f._projectileTimer <= 0) {
     f._projectileTimer = f._config.projectileInterval;
-    const dx = target.x - f.x, dy = target.y - f.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
     if (dist > 0) {
       projectiles.push({
         x: f.x, y: f.y,
-        vx: (dx/dist) * f._config.projectileSpeed, 
-        vy: (dy/dist) * f._config.projectileSpeed,
-        damage: f._config.projectileDamage, 
-        owner: 'quake', 
-        color: '#8B4513',
+        vx: (dx/dist) * f._config.projectileSpeed, vy: (dy/dist) * f._config.projectileSpeed,
+        damage: f._config.projectileDamage, owner: 'quake', color: '#8B4513',
         size: 10, life: 150, type: 'rock'
       });
     }
   }
-
-  // Cap horizontal speed only
-  const absVx = Math.abs(f.vx);
-  if (absVx > f._config.speedCap) f.vx = (f.vx / absVx) * f._config.speedCap;
 }

@@ -40,6 +40,12 @@
 			balance = rgs.formatAmount(auth.balance.amount);
 			betLevels = auth.config.betLevels;
 			actor.send({ type: 'SET_STAKE', amount: auth.config.defaultBet });
+			// End any interrupted round from previous session
+			if (auth.activeRound) {
+				await rgs.endRound();
+				const bal = rgs.getBalance();
+				if (bal) balance = rgs.formatAmount(bal.amount);
+			}
 		} catch {
 			// Will show $0.00
 		}
@@ -63,6 +69,9 @@
 			const result = await rgs.play(snap.context.stake, snap.context.selectedFighter!);
 			actor.send({ type: 'PLAY_SUCCESS', round: result.round });
 
+			// End round immediately (stateless game)
+			if (result.active) await rgs.endRound();
+
 			// Run simulation client-side for playback
 			const sim = new BattleSimulation(result.round.seed, [result.round.fighterA, result.round.fighterB]);
 			const simData = sim.runAll();
@@ -79,7 +88,7 @@
 		if (bal) balance = rgs.formatAmount(bal.amount);
 		// Play win/lose sound
 		const round = actor.getSnapshot().context.round;
-		if (round && round.winner === round.playerBet) playWin();
+		if (round && round.payoutMultiplier > 0) playWin();
 		else playLose();
 	}
 
@@ -97,6 +106,7 @@
 
 	let currentFrameIndex = $state(0);
 	let infoOpen = $state(false);
+	let playbackSpeed = $state(0.52);
 
 	// Derive current frame fighters for HP bars
 	$effect(() => {
@@ -133,11 +143,18 @@
 	</div>
 
 	{#if isPlaying && frames.length > 0}
-		<HpBars fighters={frames[currentFrameIndex]?.fighters ?? []} />
+		<div class="play-header">
+			<HpBars fighters={frames[currentFrameIndex]?.fighters ?? []} />
+			<div class="speed-controls">
+				<button class="speed-btn" class:active={playbackSpeed === 0.52} onclick={() => playbackSpeed = 0.52}>2x</button>
+				<button class="speed-btn" class:active={playbackSpeed === 1.0} onclick={() => playbackSpeed = 1.0}>4x</button>
+				<button class="speed-btn" class:active={playbackSpeed === 1.5} onclick={() => playbackSpeed = 1.5}>6x</button>
+			</div>
+		</div>
 	{/if}
 
 	<div class="arena-wrapper">
-		<Arena {frames} playing={isPlaying} onComplete={handlePlaybackComplete} onFrame={(i) => currentFrameIndex = i} onHit={(amt) => amt > 15 ? playBigHit() : playHit()} />
+		<Arena {frames} playing={isPlaying} speed={playbackSpeed} onComplete={handlePlaybackComplete} onFrame={(i) => currentFrameIndex = i} onHit={(amt) => amt > 15 ? playBigHit() : playHit()} />
 
 		{#if isResult && state.context.round && winnerFighter}
 			<WinnerOverlay
@@ -195,6 +212,18 @@
 	}
 	.arena-wrapper { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
 	.top-bar { display: flex; gap: 0.5rem; align-items: stretch; }
+	.play-header { display: flex; justify-content: space-between; align-items: center; }
+	.speed-controls { display: flex; gap: 0.25rem; }
+	.speed-btn {
+		padding: 0.2rem 0.5rem;
+		border: 1px solid #444;
+		border-radius: 4px;
+		background: #222;
+		color: #aaa;
+		font-size: 0.7rem;
+		cursor: pointer;
+	}
+	.speed-btn.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
 	.top-bar :global(:first-child) { flex: 1; }
 	.info-btn {
 		background: #222;

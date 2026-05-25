@@ -1,0 +1,112 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: 00:00
+        - button "ℹ️ Paytable" [active] [ref=e6] [cursor=pointer]
+      - generic [ref=e7]: £1000.00
+      - generic [ref=e8]:
+        - button "1×" [ref=e9] [cursor=pointer]
+        - button "2×" [ref=e10] [cursor=pointer]
+        - button "4×" [ref=e11] [cursor=pointer]
+        - button "½×" [ref=e12] [cursor=pointer]
+    - generic [ref=e15]:
+      - generic [ref=e16] [cursor=pointer]:
+        - generic [ref=e18]: Blaze
+        - generic [ref=e19]: Fast & Fiery
+        - generic [ref=e20]: Leaves fire trails that burn enemies
+      - generic [ref=e21] [cursor=pointer]:
+        - generic [ref=e23]: Quake
+        - generic [ref=e24]: Ground & Pound
+        - generic [ref=e25]: Shockwave blast pushes enemies back
+      - generic [ref=e26] [cursor=pointer]:
+        - generic [ref=e28]: Spark
+        - generic [ref=e29]: Shock & Awe
+        - generic [ref=e30]: Bouncing electric bolts ricochet off walls
+      - generic [ref=e31] [cursor=pointer]:
+        - generic [ref=e33]: Phantom
+        - generic [ref=e34]: Hit & Run
+        - generic [ref=e35]: Teleports to flank, fires shadow bolts
+    - generic [ref=e36]:
+      - generic [ref=e37]:
+        - generic [ref=e38]: Stake £
+        - spinbutton [ref=e39]: "10"
+      - button "⚔️ FIGHT" [disabled] [ref=e40]
+  - generic [ref=e42]:
+    - generic [ref=e43]:
+      - heading "⚔️ Arena Ball Fight — Paytable" [level=2] [ref=e44]
+      - button "✕" [ref=e45] [cursor=pointer]
+    - generic [ref=e46]:
+      - generic [ref=e47]: "RTP: 95.00%"
+      - generic [ref=e48]: For every £100 wagered, £95 is returned to players on average.
+    - heading "Win Tiers" [level=3] [ref=e49]
+    - table [ref=e50]:
+      - rowgroup [ref=e51]:
+        - row "Outcome Condition Multiplier Example (£10)" [ref=e52]:
+          - columnheader "Outcome" [ref=e53]
+          - columnheader "Condition" [ref=e54]
+          - columnheader "Multiplier" [ref=e55]
+          - columnheader "Example (£10)" [ref=e56]
+      - rowgroup [ref=e57]:
+        - row "💥 Obliterate Win with >60% HP 2.19× odds up to £41.61" [ref=e58]:
+          - cell "💥 Obliterate" [ref=e59]
+          - cell "Win with >60% HP" [ref=e60]
+          - cell "2.19× odds" [ref=e61]
+          - cell "up to £41.61" [ref=e62]
+        - row "⚔️ Close Call Win with 20-60% HP 0.95× odds up to £18.05" [ref=e63]:
+          - cell "⚔️ Close Call" [ref=e64]
+          - cell "Win with 20-60% HP" [ref=e65]
+          - cell "0.95× odds" [ref=e66]
+          - cell "up to £18.05" [ref=e67]
+        - row "😅 Clutch Win with <20% HP 0.67× odds up to £12.73" [ref=e68]:
+          - cell "😅 Clutch" [ref=e69]
+          - cell "Win with <20% HP" [ref=e70]
+          - cell "0.67× odds" [ref=e71]
+          - cell "up to £12.73" [ref=e72]
+        - row "💀 Defeated Lose — £0" [ref=e73]:
+          - cell "💀 Defeated" [ref=e74]
+          - cell "Lose" [ref=e75]
+          - cell "—" [ref=e76]
+          - cell "£0" [ref=e77]
+    - heading "Matchup Odds" [level=3] [ref=e78]
+    - table [ref=e79]:
+      - rowgroup [ref=e80]:
+        - row "Matchup Fighter A odds Fighter B odds" [ref=e81]:
+          - columnheader "Matchup" [ref=e82]
+          - columnheader "Fighter A odds" [ref=e83]
+          - columnheader "Fighter B odds" [ref=e84]
+      - rowgroup [ref=e85]:
+        - row "🔴 Blaze vs 🟤 Quake 1.78× 2.04×" [ref=e86]:
+          - cell "🔴 Blaze vs 🟤 Quake" [ref=e87]
+          - cell "1.78×" [ref=e88]
+          - cell "2.04×" [ref=e89]
+        - row "🔴 Blaze vs ⚡ Spark 2.47× 1.54×" [ref=e90]:
+          - cell "🔴 Blaze vs ⚡ Spark" [ref=e91]
+          - cell "2.47×" [ref=e92]
+          - cell "1.54×" [ref=e93]
+        - row "🔴 Blaze vs 👻 Phantom 1.92× 1.88×" [ref=e94]:
+          - cell "🔴 Blaze vs 👻 Phantom" [ref=e95]
+          - cell "1.92×" [ref=e96]
+          - cell "1.88×" [ref=e97]
+        - row "🟤 Quake vs ⚡ Spark 1.52× 2.52×" [ref=e98]:
+          - cell "🟤 Quake vs ⚡ Spark" [ref=e99]
+          - cell "1.52×" [ref=e100]
+          - cell "2.52×" [ref=e101]
+        - row "🟤 Quake vs 👻 Phantom 1.37× 3.09×" [ref=e102]:
+          - cell "🟤 Quake vs 👻 Phantom" [ref=e103]
+          - cell "1.37×" [ref=e104]
+          - cell "3.09×" [ref=e105]
+        - row "⚡ Spark vs 👻 Phantom 2.49× 1.54×" [ref=e106]:
+          - cell "⚡ Spark vs 👻 Phantom" [ref=e107]
+          - cell "2.49×" [ref=e108]
+          - cell "1.54×" [ref=e109]
+    - heading "How to Play" [level=3] [ref=e110]
+    - list [ref=e111]:
+      - listitem [ref=e112]: Pick your fighter
+      - listitem [ref=e113]: Set your stake (£0.10 – £500)
+      - listitem [ref=e114]: Hit FIGHT — your opponent is randomly assigned
+      - listitem [ref=e115]: Watch the battle play out
+      - listitem [ref=e116]: Win your stake × odds if your fighter wins
+    - heading "Provably Fair" [level=3] [ref=e117]
+    - paragraph [ref=e118]: Every fight outcome is determined by a cryptographic seed committed before your bet. After the fight, the seed is revealed — you can verify the result independently using SHA-256.
+    - generic [ref=e119]: "Min stake: £0.10 | Max stake: £500 | RTP: 95% | House edge: 5%"

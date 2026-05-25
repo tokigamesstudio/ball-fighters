@@ -8,9 +8,11 @@ const config = {
 		adapter: adapter({
 			pages: 'build',
 			assets: 'build',
-			fallback: 'index.html',
 			precompress: false
 		}),
+		paths: {
+			relative: true
+		},
 		alias: {
 			'$game': 'src/game',
 			'$components': 'src/components',

@@ -1,0 +1,3 @@
+[     220ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://stake-engine.com/api/admin/guidelines:0
+[     282ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://stake-engine.com/api/teams:0
+[     282ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://stake-engine.com/api/users:0

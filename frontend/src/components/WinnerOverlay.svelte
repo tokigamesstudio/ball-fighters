@@ -12,7 +12,7 @@
 
 	let { round, winner, onPlayAgain, onReset, formatAmount }: Props = $props();
 
-	const playerWon = $derived(round.winner === round.playerBet);
+	const playerWon = $derived(round.payoutMultiplier > 0);
 	const winAmount = $derived(round.payout * 1_000_000);
 
 	// Count-up animation

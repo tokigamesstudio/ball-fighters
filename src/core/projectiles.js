@@ -44,7 +44,7 @@ export function updateProjectiles(state) {
 
     // Hit fighters
     for (const f of fighters) {
-      if (f.alive === false || f.id === p.owner || (f.type === 'void' && f.phased)) continue;
+      if (f.alive === false || f.id === p.owner || f.phasing || (f.type === 'void' && f.phased)) continue;
       if (p.piercing && p.pierced && p.pierced.includes(f.id)) continue;
       const dx = f.x - p.x, dy = f.y - p.y;
       const dist = Math.sqrt(dx*dx + dy*dy);

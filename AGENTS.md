@@ -87,3 +87,5 @@ See `.agents/summary/index.md` for comprehensive documentation with architecture
 <!-- This section is for human and agent-maintained operational knowledge.
      Add repo-specific conventions, gotchas, and workflow rules here.
      This section is preserved exactly as-is when re-running codebase-summary. -->
+
+- Math upload output goes in versioned folders: `dist/math/v1/`, `dist/math/v2/`, etc. Never overwrite previous versions.

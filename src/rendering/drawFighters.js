@@ -2,8 +2,28 @@
 // FIGHTER RENDERERS — Each fighter has unique visual style
 // ═══════════════════════════════════════════════════════════════════════════
 
+// Spritesheet cache
+const spritesheets = {};
+function getSpritesheet(name, src, frames, frameSize) {
+  if (!spritesheets[name]) {
+    const img = new Image();
+    img.src = src;
+    spritesheets[name] = { img, frames, frameSize, loaded: false };
+    img.onload = () => { spritesheets[name].loaded = true; };
+  }
+  return spritesheets[name];
+}
+
 export function drawBlaze(ctx, f, frame) {
-  // Outer glow
+  const sheet = getSpritesheet('blaze', 'assets/spritesheets/blaze_idle_v2.png', 8, 512);
+  if (sheet.loaded) {
+    const frameIdx = Math.floor((frame / 5) % sheet.frames); // 12 FPS at 60 FPS game loop
+    const drawSize = f.size * 4;
+    ctx.drawImage(sheet.img, frameIdx * sheet.frameSize, 0, sheet.frameSize, sheet.frameSize, -drawSize/2, -drawSize/2, drawSize, drawSize);
+    return;
+  }
+
+  // Fallback: procedural rendering if spritesheet not loaded
   const g = ctx.createRadialGradient(0, 0, f.size*0.3, 0, 0, f.size*2);
   g.addColorStop(0, 'rgba(255,100,0,0.4)');
   g.addColorStop(1, 'transparent');
@@ -63,7 +83,15 @@ export function drawBlaze(ctx, f, frame) {
 }
 
 export function drawQuake(ctx, f, frame) {
-  // Pulsing ring
+  const sheet = getSpritesheet('quake', 'assets/spritesheets/quake_idle.png', 8, 512);
+  if (sheet.loaded) {
+    const frameIdx = Math.floor((frame / 5) % sheet.frames);
+    const drawSize = f.size * 4;
+    ctx.drawImage(sheet.img, frameIdx * sheet.frameSize, 0, sheet.frameSize, sheet.frameSize, -drawSize/2, -drawSize/2, drawSize, drawSize);
+    return;
+  }
+
+  // Fallback: procedural
   const pulseRadius = f.size + 8 + Math.sin(frame * 0.05) * 4;
   ctx.strokeStyle = 'rgba(139,69,19,0.2)';
   ctx.lineWidth = 2;
@@ -94,7 +122,15 @@ export function drawQuake(ctx, f, frame) {
 }
 
 export function drawSpark(ctx, f, frame) {
-  // Main ball
+  const sheet = getSpritesheet('spark', 'assets/spritesheets/spark_idle.png', 8, 512);
+  if (sheet.loaded) {
+    const frameIdx = Math.floor((frame / 5) % sheet.frames);
+    const drawSize = f.size * 4;
+    ctx.drawImage(sheet.img, frameIdx * sheet.frameSize, 0, sheet.frameSize, sheet.frameSize, -drawSize/2, -drawSize/2, drawSize, drawSize);
+    return;
+  }
+
+  // Fallback: procedural
   const bodyGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, f.size);
   bodyGrad.addColorStop(0, '#ffffaa');
   bodyGrad.addColorStop(0.5, '#ffff00');
@@ -130,6 +166,15 @@ export function drawSpark(ctx, f, frame) {
 }
 
 export function drawPhantom(ctx, f, frame) {
+  const sheet = getSpritesheet('phantom', 'assets/spritesheets/phantom_idle.png', 8, 512);
+  if (sheet.loaded) {
+    const frameIdx = Math.floor((frame / 5) % sheet.frames);
+    const drawSize = f.size * 4;
+    ctx.drawImage(sheet.img, frameIdx * sheet.frameSize, 0, sheet.frameSize, sheet.frameSize, -drawSize/2, -drawSize/2, drawSize, drawSize);
+    return;
+  }
+
+  // Fallback: procedural
   const pulse = 0.7 + 0.3 * Math.sin(frame * 0.08);
   ctx.globalAlpha = 0.6 * pulse;
 

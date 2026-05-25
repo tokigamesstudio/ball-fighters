@@ -1,0 +1,38 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: 00:08
+      - button "ℹ️ Paytable" [ref=e6] [cursor=pointer]
+    - generic [ref=e7]: £998.27
+    - generic [ref=e8]:
+      - button "1×" [ref=e9] [cursor=pointer]
+      - button "2×" [ref=e10] [cursor=pointer]
+      - button "4×" [ref=e11] [cursor=pointer]
+      - button "½×" [ref=e12] [cursor=pointer]
+  - generic [ref=e120]:
+    - generic [ref=e142]:
+      - generic [ref=e143]: 🔥
+      - generic [ref=e145]:
+        - generic [ref=e146]: Blaze
+        - generic [ref=e147]: "38"
+    - generic [ref=e150]:
+      - generic [ref=e151]: 👻
+      - generic [ref=e153]:
+        - generic [ref=e154]: Phantom
+        - generic [ref=e155]: "0"
+  - generic [ref=e13]:
+    - generic:
+      - generic: 🔥 Blaze ⚔️ Phantom
+    - generic:
+      - generic: 🏆
+      - heading "🔥 Close Call!" [level=2]
+      - paragraph: Close call! Hard-fought win. • Won £18.27
+      - generic [ref=e138]:
+        - button "⚔️ Play Again" [ref=e139] [cursor=pointer]
+        - button "↗ Share" [ref=e140] [cursor=pointer]
+        - button "🔍 Verify" [ref=e141] [cursor=pointer]
+  - generic [ref=e36]:
+    - generic [ref=e37]:
+      - generic [ref=e38]: Stake £
+      - spinbutton [ref=e39]: "10"
+    - button "↺ NEW" [ref=e137] [cursor=pointer]

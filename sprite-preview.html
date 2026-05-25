@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sprite Animation Preview</title>
+<style>
+body { background: #111; color: #fff; font-family: system-ui; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+h1 { margin-bottom: 20px; }
+.fighters { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
+.fighter { text-align: center; }
+.fighter h2 { margin-bottom: 10px; }
+canvas { border: 1px solid #333; border-radius: 8px; }
+</style>
+</head>
+<body>
+<h1>🔥 Ball Fighters — Sprite Preview</h1>
+<div class="fighters" id="fighters"></div>
+<script>
+const fighters = [
+  { name: 'Blaze', sheet: 'assets/spritesheets/blaze_idle_v2.png', frames: 8, size: 512 },
+  { name: 'Spark', sheet: 'assets/spritesheets/spark_idle.png', frames: 8, size: 512 },
+  { name: 'Phantom', sheet: 'assets/spritesheets/phantom_idle.png', frames: 8, size: 512 },
+  { name: 'Quake', sheet: 'assets/spritesheets/quake_idle.png', frames: 8, size: 512 },
+];
+
+const container = document.getElementById('fighters');
+
+fighters.forEach(f => {
+  const div = document.createElement('div');
+  div.className = 'fighter';
+  div.innerHTML = `<h2>${f.name}</h2>`;
+  const canvas = document.createElement('canvas');
+  canvas.width = 200;
+  canvas.height = 200;
+  div.appendChild(canvas);
+  container.appendChild(div);
+
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  img.src = f.sheet;
+  let frame = 0;
+
+  img.onload = () => {
+    setInterval(() => {
+      ctx.clearRect(0, 0, 200, 200);
+      ctx.drawImage(img, frame * f.size, 0, f.size, f.size, 0, 0, 200, 200);
+      frame = (frame + 1) % f.frames;
+    }, 83); // 12 FPS
+  };
+});
+</script>
+</body>
+</html>

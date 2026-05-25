@@ -11,7 +11,7 @@
 		onHit?: (amount: number) => void;
 	}
 
-	let { frames, playing, speed = 0.4, onComplete, onFrame, onHit }: Props = $props();
+	let { frames, playing, speed = 0.52, onComplete, onFrame, onHit }: Props = $props();
 
 	let canvas: HTMLCanvasElement;
 	let app: Application;
@@ -23,27 +23,35 @@
 	const H = 600;
 
 	const SPRITE_FRAMES = 8;
-	const SPRITE_SIZE = 512;
+	const SPRITE_SIZE = 256;
 	const FIGHTER_DISPLAY_SIZE = 50; // radius in game units
 
 	const SPRITESHEET_MAP: Record<string, string> = {
-		blaze: '/sprites/blaze_idle_v2.png',
-		quake: '/sprites/quake_idle.png',
-		spark: '/sprites/spark_idle.png',
-		phantom: '/sprites/phantom_idle.png'
+		blaze: './sprites/blaze_idle_v2.png',
+		quake: './sprites/quake_idle.png',
+		spark: './sprites/spark_idle.png',
+		phantom: './sprites/phantom_idle.png'
 	};
+
+	const BACKGROUNDS = ['./backgrounds/arena_colosseum.png', './backgrounds/arena_void.png'];
 
 	// Layers
 	let trailLayer: Graphics;
 	let projectileLayer: Graphics;
 	let particleLayer: Graphics;
 	let dangerLayer: Graphics;
-	let bgLayer: Graphics;
+	let bgSprite: Sprite | null = null;
 	let hpLayer: Graphics;
 	let damageLayer: Container;
+	let deathLayer: Container;
 
 	// Fighter sprites
 	let fighterSprites: Map<string, AnimatedSprite> = new Map();
+
+	// Death shatter state
+	interface ShatterPiece { sprite: Sprite; vx: number; vy: number; vr: number; life: number }
+	let shatterPieces: ShatterPiece[] = [];
+	let shatterAnimId: number | null = null;
 
 	async function loadFighterTextures(fighterId: string): Promise<Texture[]> {
 		const path = SPRITESHEET_MAP[fighterId] || SPRITESHEET_MAP['blaze'];
@@ -60,29 +68,95 @@
 		app = new Application();
 		await app.init({ canvas, width: W, height: H, background: '#1a1a2e', antialias: true });
 
-		bgLayer = new Graphics();
 		trailLayer = new Graphics();
 		projectileLayer = new Graphics();
 		hpLayer = new Graphics();
 		particleLayer = new Graphics();
 		dangerLayer = new Graphics();
 		damageLayer = new Container();
+		deathLayer = new Container();
 
-		app.stage.addChild(bgLayer, trailLayer, projectileLayer, hpLayer, particleLayer, dangerLayer, damageLayer);
-		drawBackground();
+		app.stage.addChild(trailLayer, projectileLayer, hpLayer, particleLayer, dangerLayer, damageLayer, deathLayer);
+
+		// Load random background
+		const bgPath = BACKGROUNDS[Math.floor(Math.random() * BACKGROUNDS.length)];
+		const bgTex = await Assets.load(bgPath);
+		bgSprite = new Sprite(bgTex);
+		bgSprite.width = W;
+		bgSprite.height = H;
+		app.stage.addChildAt(bgSprite, 0);
 	});
 
 	onDestroy(() => {
 		if (animId) cancelAnimationFrame(animId);
+		if (shatterAnimId) cancelAnimationFrame(shatterAnimId);
 		app?.destroy(true);
 	});
 
-	function drawBackground() {
-		bgLayer.clear();
-		bgLayer.rect(0, 0, W, H).fill({ color: 0x1a1a2e });
-		bgLayer.setStrokeStyle({ width: 1, color: 0x2a2a4e, alpha: 0.3 });
-		for (let x = 0; x < W; x += 40) bgLayer.moveTo(x, 0).lineTo(x, H).stroke();
-		for (let y = 0; y < H; y += 40) bgLayer.moveTo(0, y).lineTo(W, y).stroke();
+	let pendingComplete = false;
+
+	function triggerDeathShatter(sprite: AnimatedSprite, x: number, y: number) {
+		const tex = sprite.textures[sprite.currentFrame] as Texture;
+		const gridSize = 4; // 4x4 = 16 pieces
+		const pieceW = tex.frame.width / gridSize;
+		const pieceH = tex.frame.height / gridSize;
+		const scale = sprite.scale.x;
+
+		for (let row = 0; row < gridSize; row++) {
+			for (let col = 0; col < gridSize; col++) {
+				const frame = new Rectangle(
+					tex.frame.x + col * pieceW,
+					tex.frame.y + row * pieceH,
+					pieceW, pieceH
+				);
+				const pieceTex = new Texture({ source: tex.source, frame });
+				const piece = new Sprite(pieceTex);
+				piece.anchor.set(0.5);
+				piece.scale.set(scale);
+				piece.x = x + (col - gridSize / 2 + 0.5) * pieceW * scale;
+				piece.y = y + (row - gridSize / 2 + 0.5) * pieceH * scale;
+				deathLayer.addChild(piece);
+
+				const angle = Math.atan2(piece.y - y, piece.x - x) + (Math.random() - 0.5) * 0.5;
+				const speed = 2 + Math.random() * 4;
+				shatterPieces.push({
+					sprite: piece,
+					vx: Math.cos(angle) * speed,
+					vy: Math.sin(angle) * speed - 2,
+					vr: (Math.random() - 0.5) * 0.2,
+					life: 60
+				});
+			}
+		}
+
+		if (!shatterAnimId) animateShatter();
+	}
+
+	function animateShatter() {
+		shatterPieces = shatterPieces.filter(p => {
+			p.sprite.x += p.vx;
+			p.sprite.y += p.vy;
+			p.sprite.rotation += p.vr;
+			p.vy += 0.15; // gravity
+			p.life--;
+			p.sprite.alpha = p.life / 60;
+			if (p.life <= 0) {
+				deathLayer.removeChild(p.sprite);
+				p.sprite.destroy();
+				return false;
+			}
+			return true;
+		});
+
+		if (shatterPieces.length > 0) {
+			shatterAnimId = requestAnimationFrame(animateShatter);
+		} else {
+			shatterAnimId = null;
+			if (pendingComplete) {
+				pendingComplete = false;
+				onComplete?.();
+			}
+		}
 	}
 
 	async function ensureFighterSprite(f: any): Promise<AnimatedSprite> {
@@ -168,8 +242,15 @@
 			sprite.scale.set(scale);
 			sprite.x = f.x;
 			sprite.y = f.y;
-			sprite.visible = f.alive;
 			sprite.alpha = f.phasing ? 0.4 : 1;
+
+			if (!f.alive && sprite.visible) {
+				// Trigger death shatter
+				sprite.visible = false;
+				triggerDeathShatter(sprite, f.x, f.y);
+			} else {
+				sprite.visible = f.alive;
+			}
 		}
 
 		// Hide dead fighters
@@ -211,6 +292,11 @@
 			// Clear floating texts
 			for (const ft of floatingTexts) { ft.text.destroy(); }
 			floatingTexts = [];
+			// Clear shatter pieces
+			for (const p of shatterPieces) { p.sprite.destroy(); }
+			shatterPieces = [];
+			if (shatterAnimId) { cancelAnimationFrame(shatterAnimId); shatterAnimId = null; }
+			if (deathLayer) deathLayer.removeChildren();
 			// Clear graphics layers
 			if (trailLayer) trailLayer.clear();
 			if (projectileLayer) projectileLayer.clear();
@@ -222,7 +308,13 @@
 
 	function tick() {
 		if (!playing || frameIndex >= frames.length) {
-			if (frameIndex >= frames.length) onComplete?.();
+			if (frameIndex >= frames.length) {
+				if (shatterPieces.length > 0) {
+					pendingComplete = true;
+				} else {
+					onComplete?.();
+				}
+			}
 			return;
 		}
 
