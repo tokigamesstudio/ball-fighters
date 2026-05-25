@@ -1,0 +1,269 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - img "Stake Engine" [ref=e4]
+    - paragraph [ref=e5]: Stake Engine has done over 13 billion dollars in total turnover since launch.
+    - img [ref=e7]
+  - generic [ref=e11]:
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - link "stake engine logo" [ref=e15] [cursor=pointer]:
+          - /url: /
+          - img "stake engine logo" [ref=e16]
+        - button "Toggle theme" [ref=e17] [cursor=pointer]:
+          - img
+          - generic [ref=e18]: Toggle theme
+      - navigation [ref=e19]:
+        - generic [ref=e20]:
+          - generic [ref=e22]:
+            - link "Getting Started" [ref=e23] [cursor=pointer]:
+              - /url: /docs
+              - heading "Getting Started" [level=2] [ref=e24]
+            - list [ref=e27]:
+              - link "Introduction" [ref=e29] [cursor=pointer]:
+                - /url: /docs
+                - generic [ref=e30]: Introduction
+              - link "RGS Details" [ref=e32] [cursor=pointer]:
+                - /url: /docs/rgs
+                - generic [ref=e33]: RGS Details
+              - link "Wallet Endpoints" [ref=e35] [cursor=pointer]:
+                - /url: /docs/rgs/wallet
+                - generic [ref=e36]: Wallet Endpoints
+              - link "Basic RGS Example" [ref=e38] [cursor=pointer]:
+                - /url: /docs/rgs/example
+                - generic [ref=e39]: Basic RGS Example
+          - generic [ref=e41]:
+            - link "Front End" [ref=e42] [cursor=pointer]:
+              - /url: /docs/front-end
+              - heading "Front End" [level=2] [ref=e43]
+            - list [ref=e46]:
+              - link "Introduction" [ref=e48] [cursor=pointer]:
+                - /url: /docs/front-end
+                - generic [ref=e49]: Introduction
+              - link "Dependencies" [ref=e51] [cursor=pointer]:
+                - /url: /docs/front-end/dependencies
+                - generic [ref=e52]: Dependencies
+              - link "Getting Started" [ref=e54] [cursor=pointer]:
+                - /url: /docs/front-end/getting-started
+                - generic [ref=e55]: Getting Started
+              - link "Storybook" [ref=e57] [cursor=pointer]:
+                - /url: /docs/front-end/storybook
+                - generic [ref=e58]: Storybook
+              - link "Flowchart" [ref=e60] [cursor=pointer]:
+                - /url: /docs/front-end/flowchart
+                - generic [ref=e61]: Flowchart
+              - link "Task Breakdown" [ref=e63] [cursor=pointer]:
+                - /url: /docs/front-end/task-breakdown
+                - generic [ref=e64]: Task Breakdown
+              - link "Adding new events" [ref=e66] [cursor=pointer]:
+                - /url: /docs/front-end/adding-new-events
+                - generic [ref=e67]: Adding new events
+              - link "File Structure" [ref=e69] [cursor=pointer]:
+                - /url: /docs/front-end/file-structure
+                - generic [ref=e70]: File Structure
+              - link "Context" [ref=e72] [cursor=pointer]:
+                - /url: /docs/front-end/context
+                - generic [ref=e73]: Context
+              - link "UI" [ref=e75] [cursor=pointer]:
+                - /url: /docs/front-end/ui
+                - generic [ref=e76]: UI
+          - generic [ref=e78]:
+            - link "Math" [ref=e79] [cursor=pointer]:
+              - /url: /docs/math
+              - heading "Math" [level=2] [ref=e80]
+            - list [ref=e83]:
+              - link "Introduction" [ref=e85] [cursor=pointer]:
+                - /url: /docs/math
+                - generic [ref=e86]: Introduction
+              - link "Setup" [ref=e88] [cursor=pointer]:
+                - /url: /docs/math/setup
+                - generic [ref=e89]: Setup
+              - link "Quickstart Guide" [ref=e91] [cursor=pointer]:
+                - /url: /docs/math/quick-start
+                - generic [ref=e92]: Quickstart Guide
+              - link "Math File Format" [ref=e94] [cursor=pointer]:
+                - /url: /docs/math/math-file-format
+                - generic [ref=e95]: Math File Format
+              - link "SDK Directory" [ref=e97] [cursor=pointer]:
+                - /url: /docs/math/sdk-directory
+                - generic [ref=e98]: SDK Directory
+              - list [ref=e102]:
+                - link "High-Level Structure" [ref=e104] [cursor=pointer]:
+                  - /url: /docs/math/high-level-structure
+                  - generic [ref=e105]: High-Level Structure
+                - link "State Machine" [ref=e107] [cursor=pointer]:
+                  - /url: /docs/math/high-level-structure/state-machine
+                  - generic [ref=e108]: State Machine
+                - link "Game Structure" [ref=e110] [cursor=pointer]:
+                  - /url: /docs/math/high-level-structure/game-structure
+                  - generic [ref=e111]: Game Structure
+                - link "Game Format" [ref=e113] [cursor=pointer]:
+                  - /url: /docs/math/high-level-structure/game-format
+                  - generic [ref=e114]: Game Format
+              - list [ref=e118]:
+                - link "Game State Structure" [ref=e120] [cursor=pointer]:
+                  - /url: /docs/math/game-state-structure
+                  - generic [ref=e121]: Game State Structure
+                - link "Simulation Acceptance" [ref=e123] [cursor=pointer]:
+                  - /url: /docs/math/game-state-structure/simulation-acceptance
+                  - generic [ref=e124]: Simulation Acceptance
+                - list [ref=e128]:
+                  - link "Setup" [ref=e130] [cursor=pointer]:
+                    - /url: /docs/math/game-state-structure/setup/configs
+                    - generic [ref=e131]: Setup
+                  - link "Configs" [ref=e133] [cursor=pointer]:
+                    - /url: /docs/math/game-state-structure/setup/configs
+                    - generic [ref=e134]: Configs
+                  - link "Betmode" [ref=e136] [cursor=pointer]:
+                    - /url: /docs/math/game-state-structure/setup/betmode
+                    - generic [ref=e137]: Betmode
+                  - link "Distribution" [ref=e139] [cursor=pointer]:
+                    - /url: /docs/math/game-state-structure/setup/distribution
+                    - generic [ref=e140]: Distribution
+                - list [ref=e144]:
+                  - link "Source Files" [ref=e146] [cursor=pointer]:
+                    - /url: /docs/math/source-files
+                    - generic [ref=e147]: Source Files
+                  - link "Config" [ref=e149] [cursor=pointer]:
+                    - /url: /docs/math/source-files/config
+                    - generic [ref=e150]: Config
+                  - link "Events" [ref=e152] [cursor=pointer]:
+                    - /url: /docs/math/source-files/events
+                    - generic [ref=e153]: Events
+                  - link "Executables" [ref=e155] [cursor=pointer]:
+                    - /url: /docs/math/source-files/executables
+                    - generic [ref=e156]: Executables
+                  - link "State" [ref=e158] [cursor=pointer]:
+                    - /url: /docs/math/source-files/state
+                    - generic [ref=e159]: State
+                  - link "Win Manager" [ref=e161] [cursor=pointer]:
+                    - /url: /docs/math/source-files/win-manager
+                    - generic [ref=e162]: Win Manager
+                  - link "Outputs" [ref=e164] [cursor=pointer]:
+                    - /url: /docs/math/source-files/outputs
+                    - generic [ref=e165]: Outputs
+                  - list [ref=e169]:
+                    - link "Calculations" [ref=e171] [cursor=pointer]:
+                      - /url: /docs/math/source-files/calculations
+                      - generic [ref=e172]: Calculations
+                    - link "Board" [ref=e174] [cursor=pointer]:
+                      - /url: /docs/math/source-files/calculations/board
+                      - generic [ref=e175]: Board
+                    - link "Tumble" [ref=e177] [cursor=pointer]:
+                      - /url: /docs/math/source-files/calculations/tumble
+                      - generic [ref=e178]: Tumble
+                    - link "Lines" [ref=e180] [cursor=pointer]:
+                      - /url: /docs/math/source-files/calculations/lines
+                      - generic [ref=e181]: Lines
+                    - link "Ways" [ref=e183] [cursor=pointer]:
+                      - /url: /docs/math/source-files/calculations/ways
+                      - generic [ref=e184]: Ways
+                    - link "Scatter" [ref=e186] [cursor=pointer]:
+                      - /url: /docs/math/source-files/calculations/scatter
+                      - generic [ref=e187]: Scatter
+                    - link "Cluster" [ref=e189] [cursor=pointer]:
+                      - /url: /docs/math/source-files/calculations/cluster
+                      - generic [ref=e190]: Cluster
+                - link "Symbols" [ref=e192] [cursor=pointer]:
+                  - /url: /docs/math/game-state-structure/symbols
+                  - generic [ref=e193]: Symbols
+                - link "Board" [ref=e195] [cursor=pointer]:
+                  - /url: /docs/math/game-state-structure/board
+                  - generic [ref=e196]: Board
+                - link "Wins" [ref=e198] [cursor=pointer]:
+                  - /url: /docs/math/game-state-structure/wins
+                  - generic [ref=e199]: Wins
+                - link "Events" [ref=e201] [cursor=pointer]:
+                  - /url: /docs/math/game-state-structure/events
+                  - generic [ref=e202]: Events
+                - link "Force Files" [ref=e204] [cursor=pointer]:
+                  - /url: /docs/math/game-state-structure/force-files
+                  - generic [ref=e205]: Force Files
+              - link "Utilities" [ref=e207] [cursor=pointer]:
+                - /url: /docs/math/utilities
+                - generic [ref=e208]: Utilities
+              - link "Example Games" [ref=e210] [cursor=pointer]:
+                - /url: /docs/math/example-games
+                - generic [ref=e211]: Example Games
+              - link "Optimization Algorithm" [ref=e213] [cursor=pointer]:
+                - /url: /docs/math/optimization-algorithm
+                - generic [ref=e214]: Optimization Algorithm
+          - generic [ref=e216]:
+            - link "Approval Guidelines" [ref=e217] [cursor=pointer]:
+              - /url: /docs/approval-guidelines
+              - heading "Approval Guidelines" [level=2] [ref=e218]
+            - list [ref=e222]:
+              - link "Submission Checklist" [ref=e224] [cursor=pointer]:
+                - /url: /docs/approval-guidelines/submission-checklist
+                - generic [ref=e225]: Submission Checklist
+              - link "General Requirements" [ref=e227] [cursor=pointer]:
+                - /url: /docs/approval-guidelines
+                - generic [ref=e228]: General Requirements
+              - link "Game Replay Requirements" [ref=e230] [cursor=pointer]:
+                - /url: /docs/approval-guidelines/game-replay-requirements
+                - generic [ref=e231]: Game Replay Requirements
+              - link "Game Quality Rankings" [ref=e233] [cursor=pointer]:
+                - /url: /docs/approval-guidelines/game-quality-rankings
+                - generic [ref=e234]: Game Quality Rankings
+              - link "RGS Communication" [ref=e236] [cursor=pointer]:
+                - /url: /docs/approval-guidelines/rgs-communication
+                - generic [ref=e237]: RGS Communication
+              - link "Front End Communication" [ref=e239] [cursor=pointer]:
+                - /url: /docs/approval-guidelines/front-end-communication
+                - generic [ref=e240]: Front End Communication
+              - link "Math Verification" [ref=e242] [cursor=pointer]:
+                - /url: /docs/approval-guidelines/math-verification
+                - generic [ref=e243]: Math Verification
+              - link "Game Tile Requirements" [ref=e245] [cursor=pointer]:
+                - /url: /docs/approval-guidelines/game-tile-requirements
+                - generic [ref=e246]: Game Tile Requirements
+              - link "General Disclaimer" [ref=e248] [cursor=pointer]:
+                - /url: /docs/approval-guidelines/general-disclaimer
+                - generic [ref=e249]: General Disclaimer
+              - link "Jurisdiction Requirements" [ref=e251] [cursor=pointer]:
+                - /url: /docs/approval-guidelines/jurisdiction-requirements
+                - generic [ref=e252]: Jurisdiction Requirements
+          - generic [ref=e254]:
+            - link "Legal" [ref=e255] [cursor=pointer]:
+              - /url: /docs/terms
+              - heading "Legal" [level=2] [ref=e256]
+            - list [ref=e259]:
+              - link "Terms & Conditions" [ref=e261] [cursor=pointer]:
+                - /url: /docs/terms
+                - generic [ref=e262]: Terms & Conditions
+              - link "Privacy Policy" [ref=e264] [cursor=pointer]:
+                - /url: /docs/privacy
+                - generic [ref=e265]: Privacy Policy
+    - main [ref=e267]:
+      - generic [ref=e268]:
+        - heading "Submission Checklist" [level=1] [ref=e269]
+        - paragraph [ref=e270]:
+          - text: Use this checklist before submitting your game for approval.
+          - strong [ref=e271]: Incomplete submissions cause delays
+          - text: — games that do not meet all requirements will be held until the issues are resolved, which may push your go-live date back significantly.
+        - blockquote [ref=e272]:
+          - paragraph [ref=e273]:
+            - strong [ref=e274]: "Important:"
+            - text: The review queue is shared across all teams. Submissions that fail basic checks take reviewer time away from other games and may result in your request being deprioritised. Ensuring everything is in order before you submit is the single most effective way to get your game live quickly.
+        - separator [ref=e275]
+        - heading "Approval Requirements" [level=2] [ref=e276]
+        - paragraph [ref=e277]: The checklist below reflects the exact criteria your game will be reviewed against. Requirements may vary based on your team’s trust level.
+        - generic [ref=e278]:
+          - paragraph [ref=e279]: Login required
+          - paragraph [ref=e280]:
+            - text: You must be logged in to view the approval guidelines.
+            - link "Log in →" [ref=e281] [cursor=pointer]:
+              - /url: /auth/login
+        - separator [ref=e282]
+        - heading "What Happens After Submission" [level=2] [ref=e283]
+        - paragraph [ref=e284]:
+          - text: Once you submit, three independent reviewers will be assigned to your game. Each reviewer rates your game from
+          - strong [ref=e285]: 0 to 3 stars
+          - text: across design, gameplay, and math compliance. Ratings remain hidden until all three are submitted.
+        - list [ref=e286]:
+          - listitem [ref=e287]:
+            - strong [ref=e288]: Average ≥ 1 star
+            - text: → Game is approved for production.
+          - listitem [ref=e289]:
+            - strong [ref=e290]: Average < 1 star
+            - text: → Game is rejected. Reviewers may provide feedback and you may resubmit after addressing it.
+        - paragraph [ref=e291]: The review process can be as quick as a couple of hours, however submitting an incomplete or non-compliant game blows out that timeline and can take weeks.

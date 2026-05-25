@@ -16,13 +16,13 @@ const initialParams = {
     projectileDamage: 31,
     projectileCooldown: 47
   },
-  spark: {
+  air: {
     speed: 5,
     hp: 75,
     projectileDamage: 18,
     projectileCooldown: 30
   },
-  phantom: {
+  water: {
     speed: 3.5,
     hp: 95,
     projectileDamage: 18,

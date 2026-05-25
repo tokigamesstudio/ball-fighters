@@ -2,7 +2,7 @@
 // MAIN RENDERER — Orchestrates all draw calls
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { drawBlaze, drawQuake, drawSpark, drawPhantom } from './drawFighters.js';
+import { drawBlaze, drawQuake, drawAir, drawWater } from './drawFighters.js';
 import { drawFireTrails, drawParticles, drawProjectiles } from './drawEffects.js';
 
 let activeCracks = [];
@@ -187,8 +187,8 @@ export function renderFrame(ctx, canvas, fd, result, screenShake, floatingTexts,
     switch (f.type) {
       case 'blaze': drawBlaze(ctx, f, fd.frame); break;
       case 'quake': drawQuake(ctx, f, fd.frame); break;
-      case 'spark': drawSpark(ctx, f, fd.frame); break;
-      case 'phantom': drawPhantom(ctx, f, fd.frame); break;
+      case 'air': drawAir(ctx, f, fd.frame); break;
+      case 'water': drawWater(ctx, f, fd.frame); break;
     }
 
     ctx.restore();

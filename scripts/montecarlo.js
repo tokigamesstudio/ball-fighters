@@ -53,11 +53,11 @@ console.log('\n=== 1v1 Matchup Analysis (5000 simulations each) ===\n');
 
 const matchups = [
   ['blaze', 'quake'],
-  ['blaze', 'spark'],
-  ['blaze', 'phantom'],
-  ['quake', 'spark'],
-  ['quake', 'phantom'],
-  ['spark', 'phantom']
+  ['blaze', 'air'],
+  ['blaze', 'water'],
+  ['quake', 'air'],
+  ['quake', 'water'],
+  ['air', 'water']
 ];
 
 matchups.forEach(([fighterA, fighterB]) => {

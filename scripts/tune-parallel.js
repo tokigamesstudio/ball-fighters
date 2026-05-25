@@ -3,17 +3,17 @@ import { BattleSimulation } from '../src/core/simulation.js';
 const PARAMS = {
   blaze:   { hp:[60,180], skillCooldown:[50,150], impulsePower:[2,7], fireTrailDamage:[1,5] },
   quake:   { hp:[60,180], skillCooldown:[80,180], shockwaveDamage:[15,40], shockwaveRange:[120,280] },
-  spark:   { hp:[60,180], skillCooldown:[40,100], boltDamage:[8,24], directionChangeInterval:[25,70] },
-  phantom: { hp:[60,180], skillCooldown:[100,200], boltDamage:[12,30], homingInterval:[20,50], dashPower:[5,12] }
+  air:   { hp:[60,180], skillCooldown:[40,100], boltDamage:[8,24], directionChangeInterval:[25,70] },
+  water: { hp:[60,180], skillCooldown:[100,200], boltDamage:[12,30], homingInterval:[20,50], dashPower:[5,12] }
 };
 
 const PAIRS = [
   ['blaze', 'quake'],
-  ['blaze', 'spark'],
-  ['blaze', 'phantom'],
-  ['quake', 'spark'],
-  ['quake', 'phantom'],
-  ['spark', 'phantom']
+  ['blaze', 'air'],
+  ['blaze', 'water'],
+  ['quake', 'air'],
+  ['quake', 'water'],
+  ['air', 'water']
 ];
 
 function clamp(val, [min, max]) {

@@ -78,10 +78,10 @@ const FINISHING_MOVES = {
       ctx.restore();
     }
   },
-  spark: {
-    name: 'THUNDER STRIKE',
-    color: '#FFD700',
-    glow: '#FFF700',
+  air: {
+    name: 'CYCLONE STRIKE',
+    color: '#87CEEB',
+    glow: '#B0E0E6',
     draw(ctx, x, y, progress, W, H) {
       // Lightning bolts from top of screen to target
       const alpha = 1 - progress * 0.8;
@@ -118,10 +118,10 @@ const FINISHING_MOVES = {
       ctx.restore();
     }
   },
-  phantom: {
-    name: 'VOID COLLAPSE',
-    color: '#9B59B6',
-    glow: '#BB79D6',
+  water: {
+    name: 'TIDAL COLLAPSE',
+    color: '#1E90FF',
+    glow: '#4169E1',
     draw(ctx, x, y, progress, W, H) {
       // Imploding void circle + ghostly afterimages
       const alpha = 1 - progress;

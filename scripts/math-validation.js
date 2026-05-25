@@ -20,14 +20,14 @@ const STAKE = 1; // Normalize to 1 unit
 // Matchup probabilities (from round.js)
 const MATCHUP_PROBS = {
   'blaze:quake':   { blaze: 0.535, quake: 0.465 },
-  'blaze:spark':   { blaze: 0.384, spark: 0.616 },
-  'blaze:phantom': { blaze: 0.494, phantom: 0.506 },
-  'quake:spark':   { quake: 0.623, spark: 0.377 },
-  'phantom:quake': { phantom: 0.307, quake: 0.693 },
-  'phantom:spark': { phantom: 0.618, spark: 0.382 },
+  'air:blaze':   { blaze: 0.384, air: 0.616 },
+  'blaze:water': { blaze: 0.494, water: 0.506 },
+  'air:quake':   { quake: 0.623, air: 0.377 },
+  'water:quake': { water: 0.307, quake: 0.693 },
+  'air:water': { water: 0.618, air: 0.382 },
 };
 
-const FIGHTERS = ['blaze', 'quake', 'spark', 'phantom'];
+const FIGHTERS = ['blaze', 'quake', 'air', 'water'];
 
 function getMatchupKey(a, b) {
   return [a, b].sort().join(':');
@@ -61,7 +61,7 @@ function simulate(iterations) {
     totalWagered += STAKE;
     const winnerType = result.winner?.type;
     // Map type to fighter name
-    const typeToName = { fire: 'blaze', earth: 'quake', electric: 'spark', void: 'phantom' };
+    const typeToName = { fire: 'blaze', earth: 'quake', electric: 'air', void: 'water' };
     const winnerName = typeToName[winnerType] || winnerType;
     const playerWon = winnerName === playerFighter;
 
@@ -139,7 +139,7 @@ function analyzeResults(data) {
   const maxWinHitRate = iterations / maxWinCount;
 
   // Theoretical max: best odds × obliterate multiplier
-  // Best odds = (1 - 0.05) / lowest_win_prob → spark vs quake: 0.377 → odds 2.52
+  // Best odds = (1 - 0.05) / lowest_win_prob → air vs quake: 0.377 → odds 2.52
   const theoreticalMaxOdds = oddsForFighter(0.307, HOUSE_EDGE); // phantom vs quake (30.7%)
   const theoreticalMax = STAKE * theoreticalMaxOdds * 2.19;
 

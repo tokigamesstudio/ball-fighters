@@ -9,7 +9,7 @@ Browser-based arena fighting game with slot-style betting backend. JavaScript ES
 ```
 src/
 ├── core/           → Simulation engine, physics, RNG, projectiles
-├── fighters/       → Fighter AI modules (blaze, quake, spark, phantom)
+├── fighters/       → Fighter AI modules (blaze, quake, air, water)
 ├── rendering/      → Canvas 2D rendering (fighters, effects, UI)
 └── game.js         → Client entry point (UI orchestration, server calls, playback)
 
@@ -68,11 +68,11 @@ State object passed to `updateFighter`:
 
 Used in `server/round.js` for odds calculation:
 - blaze:quake → 53.5% / 46.5%
-- blaze:spark → 38.4% / 61.6%
-- blaze:phantom → 49.4% / 50.6%
-- quake:spark → 62.3% / 37.7%
-- phantom:quake → 30.7% / 69.3%
-- phantom:spark → 61.8% / 38.2%
+- blaze:air → 38.4% / 61.6%
+- blaze:water → 49.4% / 50.6%
+- quake:air → 62.3% / 37.7%
+- water:quake → 30.7% / 69.3%
+- water:air → 61.8% / 38.2%
 
 ## Known Issues
 

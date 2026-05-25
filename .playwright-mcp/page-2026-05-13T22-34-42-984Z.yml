@@ -1,0 +1,27 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: 00:03
+      - button "ℹ️ Paytable" [ref=e6] [cursor=pointer]
+    - generic [ref=e7]: £990.00
+    - generic [ref=e8]:
+      - button "1×" [ref=e9] [cursor=pointer]
+      - button "2×" [ref=e10] [cursor=pointer]
+      - button "4×" [ref=e11] [cursor=pointer]
+      - button "½×" [ref=e12] [cursor=pointer]
+  - generic [ref=e41]:
+    - generic [ref=e42]:
+      - generic [ref=e43]: 🔥
+      - generic [ref=e45]:
+        - generic [ref=e46]: Blaze
+        - generic [ref=e47]: "56"
+    - generic [ref=e50]:
+      - generic [ref=e51]: 🪨
+      - generic [ref=e53]:
+        - generic [ref=e54]: Quake
+        - generic [ref=e55]: "78"
+  - generic [ref=e36]:
+    - generic [ref=e37]:
+      - generic [ref=e38]: Stake £
+      - spinbutton [ref=e39]: "10"
+    - button "↺ NEW" [ref=e58] [cursor=pointer]

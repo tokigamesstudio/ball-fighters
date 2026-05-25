@@ -29,7 +29,7 @@ const PROMPTS = {
     'rocky stone ball character, pulsing with earth energy, dark background, game sprite, centered',
     'rocky stone ball character, settling debris, dark background, game sprite, centered',
   ],
-  spark: [
+  air: [
     'electric ball character, lightning arcs upward, dark background, game sprite, centered',
     'electric ball character, sparks flying right, dark background, game sprite, centered',
     'electric ball character, bright electric burst, dark background, game sprite, centered',
@@ -37,7 +37,7 @@ const PROMPTS = {
     'electric ball character, intense crackling energy, dark background, game sprite, centered',
     'electric ball character, dimming between pulses, dark background, game sprite, centered',
   ],
-  phantom: [
+  water: [
     'ghostly purple void ball character, wisps floating up, dark background, game sprite, centered',
     'ghostly purple void ball character, shadow tendrils reaching right, dark background, game sprite, centered',
     'ghostly purple void ball character, void energy expanding, dark background, game sprite, centered',

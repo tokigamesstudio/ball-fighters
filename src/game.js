@@ -29,8 +29,8 @@ let jurisdictionFlags = null;
 const fighterColors = {
   blaze: '#ff4400',
   boulder: '#8B4513',
-  spark: '#FFD700',
-  phantom: '#9B59B6'
+  air: '#87CEEB',
+  water: '#1E90FF'
 };
 
 function showErrorMessage(msg) {

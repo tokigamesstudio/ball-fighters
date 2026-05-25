@@ -6,11 +6,11 @@ import { runSimulation } from './ports/simulation.js';
 // Key format: `${fighterA}:${fighterB}` where fighterA < fighterB alphabetically
 const MATCHUP_PROBS = {
   'blaze:quake':   { blaze: 0.545, quake: 0.455 },
-  'blaze:spark':   { blaze: 0.402, spark: 0.598 },
-  'blaze:phantom': { blaze: 0.490, phantom: 0.510 },
-  'quake:spark':   { quake: 0.489, spark: 0.511 },
-  'phantom:quake': { phantom: 0.370, quake: 0.630 },
-  'phantom:spark': { phantom: 0.587, spark: 0.413 },
+  'air:blaze':     { blaze: 0.402, air: 0.598 },
+  'blaze:water':   { blaze: 0.490, water: 0.510 },
+  'air:quake':     { quake: 0.489, air: 0.511 },
+  'quake:water':   { water: 0.370, quake: 0.630 },
+  'air:water':     { water: 0.587, air: 0.413 },
 };
 
 function getMatchupProbs(fighterA, fighterB) {

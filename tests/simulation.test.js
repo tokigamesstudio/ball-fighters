@@ -5,7 +5,7 @@ describe('BattleSimulation', () => {
   it('creates 4 fighters with types blaze, quake, spark, phantom', () => {
     const sim = new BattleSimulation('test-seed');
     const types = sim.fighters.map(f => f.type);
-    expect(types).toEqual(['blaze', 'quake', 'spark', 'phantom']);
+    expect(types).toEqual(['blaze', 'quake', 'air', 'water']);
   });
 
   it('step() increments frame by 1', () => {

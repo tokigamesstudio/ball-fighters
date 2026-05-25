@@ -6,8 +6,8 @@ import { applyBounds, resolveBallCollision, applyFriction, applyGravity, capSpee
 import { updateProjectiles } from './projectiles.js';
 import * as Blaze from '../fighters/blaze.js';
 import * as Quake from '../fighters/quake.js';
-import * as Spark from '../fighters/spark.js';
-import * as Phantom from '../fighters/phantom.js';
+import * as Air from '../fighters/air.js';
+import * as Water from '../fighters/water.js';
 
 export class BattleSimulation {
   constructor(seed, fighterNames, fighterConfigs = {}) {
@@ -38,10 +38,10 @@ export class BattleSimulation {
     const allFighters = [
       { name: 'blaze', create: (cfg) => Blaze.createFighter(this.W, this.H, cfg) },
       { name: 'quake', create: (cfg) => Quake.createFighter(this.W, this.H, cfg) },
-      { name: 'spark', create: (cfg) => Spark.createFighter(this.W, this.H, cfg) },
-      { name: 'phantom', create: (cfg) => Phantom.createFighter(this.W, this.H, cfg) }
+      { name: 'air', create: (cfg) => Air.createFighter(this.W, this.H, cfg) },
+      { name: 'water', create: (cfg) => Water.createFighter(this.W, this.H, cfg) }
     ];
-    const defaultFighters = ['blaze', 'quake', 'spark', 'phantom'];
+    const defaultFighters = ['blaze', 'quake', 'air', 'water'];
     this.fighters = fighterNames
       ? allFighters.filter(f => fighterNames.includes(f.name)).map(f => f.create(fighterConfigs[f.name] || {}))
       : allFighters.filter(f => defaultFighters.includes(f.name)).map(f => f.create(fighterConfigs[f.name] || {}));
@@ -129,8 +129,8 @@ export class BattleSimulation {
       switch (f.type) {
         case 'blaze': Blaze.updateFighter(f, alive, state); break;
         case 'quake': Quake.updateFighter(f, alive, state); break;
-        case 'spark': Spark.updateFighter(f, alive, state); break;
-        case 'phantom': Phantom.updateFighter(f, alive, state); break;
+        case 'air': Air.updateFighter(f, alive, state); break;
+        case 'water': Water.updateFighter(f, alive, state); break;
       }
 
       // Sync flashEffect back

@@ -31,7 +31,7 @@ describe('Slot Lifecycle', () => {
     expect(res.body).toHaveProperty('payout');
     expect(res.body).toHaveProperty('seedHash');
     expect(res.body).toHaveProperty('seed');
-    expect(['blaze', 'quake', 'spark', 'phantom']).toContain(res.body.winner);
+    expect(['blaze', 'quake', 'air', 'water']).toContain(res.body.winner);
   });
 
   it('Player balance is debited by stake amount', async () => {
@@ -149,7 +149,7 @@ describe('Slot Lifecycle', () => {
     expect(sim.winner.type).toBe(winner);
     
     // 4. Verify opponent was deterministically selected
-    const opponents = ['quake', 'spark', 'phantom']; // blaze excluded
+    const opponents = ['quake', 'air', 'water']; // blaze excluded
     const opponentIndex = parseInt(seed.slice(0, 2), 16) % opponents.length;
     expect(fighterB).toBe(opponents[opponentIndex]);
   });

@@ -64,7 +64,7 @@ describe('Round Model', () => {
     const round = createRound({ fighterA: 'blaze', fighterB: 'quake' }, store);
     
     expect(() => {
-      placeBet(round.id, { playerId: 'player1', fighter: 'spark', stake: 100 }, store);
+      placeBet(round.id, { playerId: 'player1', fighter: 'air', stake: 100 }, store);
     }).toThrow(InvalidFighterError);
   });
 

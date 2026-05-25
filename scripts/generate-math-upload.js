@@ -16,7 +16,7 @@ import crypto from 'crypto';
 
 const SIMS_PER_MODE = parseInt(process.argv[2]) || 100_000;
 const OUTPUT_DIR = 'dist/math/v10';
-const FIGHTERS = ['blaze', 'quake', 'spark', 'phantom'];
+const FIGHTERS = ['blaze', 'quake', 'air', 'water'];
 
 // Volatility profiles: target hit rates and payout shapes
 // HIGH vol = low hit rate, no small payouts, big when it pays (STD DEV 20+)
@@ -25,8 +25,8 @@ const FIGHTERS = ['blaze', 'quake', 'spark', 'phantom'];
 const VOLATILITY = {
   blaze:   { hitRate: 0.28, minMult: 0.3, maxMult: 300, finisherMult: 2000, finisherChance: 0.003 },   // MEDIUM
   quake:   { hitRate: 0.40, minMult: 0.3, maxMult: 80, finisherMult: 500, finisherChance: 0.005 },     // LOW
-  spark:   { hitRate: 0.18, minMult: 0.5, maxMult: 800, finisherMult: 5000, finisherChance: 0.002 },   // HIGH
-  phantom: { hitRate: 0.22, minMult: 0.4, maxMult: 500, finisherMult: 3000, finisherChance: 0.0025 },  // MEDIUM-HIGH
+  air:     { hitRate: 0.18, minMult: 0.5, maxMult: 800, finisherMult: 5000, finisherChance: 0.002 },   // HIGH
+  water:   { hitRate: 0.22, minMult: 0.4, maxMult: 500, finisherMult: 3000, finisherChance: 0.0025 },  // MEDIUM-HIGH
 };
 
 if (existsSync(OUTPUT_DIR)) execSync(`rm -rf ${OUTPUT_DIR}`);

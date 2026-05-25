@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import { createRound, placeBet, resolveRound } from '../round.js';
 import { calcPayout, getTier } from '../payout.js';
 
-const FIGHTERS = ['blaze', 'quake', 'spark', 'phantom'];
+const FIGHTERS = ['blaze', 'quake', 'air', 'water'];
 
 export class InsufficientBalanceError extends Error {
   constructor() {

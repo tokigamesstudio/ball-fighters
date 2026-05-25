@@ -37,10 +37,10 @@
 			<table>
 				<thead><tr><th>Fighter</th><th>Style</th><th>Ability</th></tr></thead>
 				<tbody>
-				<tr><td>🔥 Blaze</td><td>Aggressive</td><td>Fire trails, area damage</td></tr>
-				<tr><td>🪨 Quake</td><td>Tank</td><td>Ground pounds, high mass</td></tr>
-				<tr><td>⚡ Spark</td><td>Ranged</td><td>Bouncing electric projectiles</td></tr>
-				<tr><td>👻 Phantom</td><td>Evasive</td><td>Teleportation, phasing</td></tr>
+				<tr><td>Fire</td><td>Aggressive</td><td>Fire trails, area damage</td></tr>
+				<tr><td>Earth</td><td>Tank</td><td>Ground pounds, high mass</td></tr>
+				<tr><td>Air</td><td>Ranged</td><td>Wind blade projectiles</td></tr>
+				<tr><td>Water</td><td>Evasive</td><td>Mist form, water bolts</td></tr>
 				</tbody>
 			</table>
 

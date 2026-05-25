@@ -21,7 +21,7 @@ node server/index.js
 
 ## How It Works
 
-1. **Select a fighter** — Choose from Blaze, Quake, Spark, or Phantom
+1. **Select a fighter** — Choose from Fire, Earth, Air, or Water
 2. **Place a bet** — Stake credits on your fighter winning
 3. **Watch the battle** — Deterministic simulation plays out with physics and special abilities
 4. **Collect winnings** — Payout depends on how decisively your fighter wins (tiered: Obliterate > Close Call > Clutch)
@@ -30,10 +30,10 @@ node server/index.js
 
 | Fighter | Style | Strength |
 |---------|-------|----------|
-| 🔥 Blaze | Aggressive | Fire trails, area damage |
-| 🪨 Quake | Tank | Ground pounds, high mass |
-| ⚡ Spark | Ranged | Bouncing electric projectiles |
-| 👻 Phantom | Evasive | Teleportation, phasing |
+| Fire (Blaze) | Aggressive | Fire trails, area damage |
+| Earth (Quake) | Tank | Ground pounds, high mass |
+| Air | Ranged | Wind blade projectiles |
+| Water | Evasive | Mist form, water bolts |
 
 ## Architecture
 

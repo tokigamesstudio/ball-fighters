@@ -15,11 +15,11 @@ console.log('=== Ball Fighter 1v1 Matchup Analysis (500 simulations each) ===\n'
 
 const matchups = [
   ['blaze', 'boulder'],
-  ['blaze', 'spark'],
-  ['blaze', 'phantom'],
-  ['boulder', 'spark'],
-  ['boulder', 'phantom'],
-  ['spark', 'phantom'],
+  ['blaze', 'air'],
+  ['blaze', 'water'],
+  ['boulder', 'air'],
+  ['boulder', 'water'],
+  ['air', 'water'],
 ];
 
 matchups.forEach(([a, b]) => {

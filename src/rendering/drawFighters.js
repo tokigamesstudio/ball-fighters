@@ -121,8 +121,8 @@ export function drawQuake(ctx, f, frame) {
   ctx.beginPath(); ctx.arc(6, 3, 2, 0, Math.PI*2); ctx.fill();
 }
 
-export function drawSpark(ctx, f, frame) {
-  const sheet = getSpritesheet('spark', 'assets/spritesheets/spark_idle.png', 8, 512);
+export function drawAir(ctx, f, frame) {
+  const sheet = getSpritesheet('air', 'assets/spritesheets/air_idle.png', 8, 512);
   if (sheet.loaded) {
     const frameIdx = Math.floor((frame / 5) % sheet.frames);
     const drawSize = f.size * 4;
@@ -165,8 +165,8 @@ export function drawSpark(ctx, f, frame) {
   ctx.globalAlpha = 1;
 }
 
-export function drawPhantom(ctx, f, frame) {
-  const sheet = getSpritesheet('phantom', 'assets/spritesheets/phantom_idle.png', 8, 512);
+export function drawWater(ctx, f, frame) {
+  const sheet = getSpritesheet('water', 'assets/spritesheets/water_idle.png', 8, 512);
   if (sheet.loaded) {
     const frameIdx = Math.floor((frame / 5) % sheet.frames);
     const drawSize = f.size * 4;

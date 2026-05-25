@@ -1,0 +1,30 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]: 00:04
+    - generic [ref=e5]:
+      - button "1×" [ref=e6] [cursor=pointer]
+      - button "2×" [ref=e7] [cursor=pointer]
+      - button "4×" [ref=e8] [cursor=pointer]
+      - button "½×" [ref=e9] [cursor=pointer]
+  - generic [ref=e33]:
+    - generic [ref=e34]:
+      - generic [ref=e35]: 🔥
+      - generic [ref=e37]:
+        - generic [ref=e38]: Blaze
+        - generic [ref=e39]: "23"
+    - generic [ref=e42]:
+      - generic [ref=e43]: 🪨
+      - generic [ref=e45]:
+        - generic [ref=e46]: Boulder
+        - generic [ref=e47]: "0"
+  - generic [ref=e10]:
+    - generic:
+      - generic: 🔥 Blaze ⚔️ Boulder
+    - generic [ref=e51]:
+      - generic [ref=e52]: 🏆
+      - heading "🔥 Blaze Wins!" [level=2] [ref=e53]
+      - paragraph [ref=e54]: "HP: 23/80 • 4.7s • Seed: 7t6y4f14mp1r3f8n"
+  - generic [ref=e29]:
+    - button "↺ NEW" [ref=e50] [cursor=pointer]
+    - generic [ref=e31]: Complete
+  - textbox "Seed (auto-generated)" [ref=e32]: 7t6y4f14mp1r3f8n

@@ -2,60 +2,30 @@
 // EFFECT RENDERERS — Fire trails, particles, projectiles
 // ═══════════════════════════════════════════════════════════════════════════
 
+// Fire trail spritesheet: 10 frames, 1200x360 total → 120x360 per frame
+const fireTrailSprite = new Image();
+fireTrailSprite.src = 'assets/sprites/fire-trail.jpg';
+const FIRE_FRAMES = 10;
+const FIRE_FRAME_W = 120;
+const FIRE_FRAME_H = 360;
+const FIRE_DRAW_W = 24;  // rendered width per flame
+const FIRE_DRAW_H = 72;  // rendered height per flame
+
 export function drawFireTrails(ctx, fireTrails, frame) {
+  if (!fireTrailSprite.complete) return;
   for (const t of fireTrails) {
     const alpha = (t.life / t.maxLife) * 0.85;
     if (alpha <= 0) continue;
-    
-    // Draw 3 flame tongues per trail spot
-    for (let i = 0; i < 3; i++) {
-      const flicker = Math.sin(frame * 0.4 + t.x * 0.1 + i * 2.1) * 0.5 + 0.5; // 0-1
-      const height = 12 + flicker * 10; // 12-22px tall
-      const width = 6 + Math.sin(frame * 0.3 + i * 1.4) * 2; // 4-8px wide
-      const offsetX = (i - 1) * 7 + Math.sin(frame * 0.25 + i) * 3;
-      const cx = t.x + offsetX;
-      const cy = t.y;
-      
-      // Flame gradient: orange base -> yellow mid -> white tip
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy - height * 0.5, height);
-      grad.addColorStop(0, `rgba(255,60,0,${alpha})`);
-      grad.addColorStop(0.4, `rgba(255,140,0,${alpha * 0.8})`);
-      grad.addColorStop(0.75, `rgba(255,220,0,${alpha * 0.5})`);
-      grad.addColorStop(1, `rgba(255,255,200,0)`);
-      
-      // Teardrop flame shape using bezier curves
-      ctx.save();
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy); // base
-      ctx.bezierCurveTo(
-        cx + width, cy - height * 0.3,
-        cx + width * 0.5, cy - height * 0.8,
-        cx + Math.sin(frame * 0.2 + i) * 2, cy - height // tip sways
-      );
-      ctx.bezierCurveTo(
-        cx - width * 0.5, cy - height * 0.8,
-        cx - width, cy - height * 0.3,
-        cx, cy
-      );
-      ctx.fill();
-      ctx.restore();
-    }
-    
-    // Ember particles: small bright dots floating up
-    for (let e = 0; e < 2; e++) {
-      const emberPhase = (frame * 0.08 + t.x * 0.05 + e * 3.7) % 1;
-      const ex = t.x + Math.sin(frame * 0.15 + e * 2.3) * 8;
-      const ey = t.y - emberPhase * 25;
-      const ea = alpha * (1 - emberPhase) * 0.9;
-      ctx.save();
-      ctx.globalAlpha = ea;
-      ctx.fillStyle = emberPhase < 0.5 ? '#ffcc00' : '#ff6600';
-      ctx.beginPath();
-      ctx.arc(ex, ey, 1.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
+    // Each trail spot gets its own animation offset based on position
+    const frameIdx = (Math.floor(frame * 0.15 + t.x * 0.3) % FIRE_FRAMES + FIRE_FRAMES) % FIRE_FRAMES;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(
+      fireTrailSprite,
+      frameIdx * FIRE_FRAME_W, 0, FIRE_FRAME_W, FIRE_FRAME_H,
+      t.x - FIRE_DRAW_W / 2, t.y - FIRE_DRAW_H, FIRE_DRAW_W, FIRE_DRAW_H
+    );
+    ctx.restore();
   }
 }
 

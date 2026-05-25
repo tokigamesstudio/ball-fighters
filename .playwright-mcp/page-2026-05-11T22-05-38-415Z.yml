@@ -1,0 +1,25 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]: 00:00
+    - generic [ref=e5]:
+      - button "1×" [ref=e6] [cursor=pointer]
+      - button "2×" [ref=e7] [cursor=pointer]
+      - button "4×" [ref=e8] [cursor=pointer]
+      - button "½×" [ref=e9] [cursor=pointer]
+  - generic [ref=e12]:
+    - generic [ref=e13] [cursor=pointer]:
+      - generic [ref=e15]: Blaze
+      - generic [ref=e16]: Fast & Fiery
+    - generic [ref=e17] [cursor=pointer]:
+      - generic [ref=e19]: Boulder
+      - generic [ref=e20]: Slow & Deadly
+    - generic [ref=e21] [cursor=pointer]:
+      - generic [ref=e23]: Spark
+      - generic [ref=e24]: Shock & Awe
+    - generic [ref=e25] [cursor=pointer]:
+      - generic [ref=e27]: Phantom
+      - generic [ref=e28]: Hit & Run
+  - generic [ref=e29]:
+    - button "⚔️ FIGHT" [ref=e30] [cursor=pointer]
+    - generic [ref=e31]: Blaze selected
+  - textbox "Seed (auto-generated)" [ref=e32]

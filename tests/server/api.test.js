@@ -90,7 +90,7 @@ describe('HTTP API', () => {
 
     await request(app)
       .post('/round/bet')
-      .send({ roundId: createRes.body.roundId, playerId: 'p1', fighter: 'spark', stake: 10 })
+      .send({ roundId: createRes.body.roundId, playerId: 'p1', fighter: 'air', stake: 10 })
       .expect(400);
   });
 

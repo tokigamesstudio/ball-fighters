@@ -7,10 +7,10 @@
 	let { selected, onSelect }: Props = $props();
 
 	const fighters = [
-		{ id: 'blaze', name: 'Blaze', sprite: './sprites/blaze_idle_v2.png', color: '#ff4400', hp: 76, dmg: 60, speed: 60, volatility: 'Medium' },
-		{ id: 'quake', name: 'Quake', sprite: './sprites/quake_idle.png', color: '#8B4513', hp: 100, dmg: 30, speed: 30, volatility: 'Low' },
-		{ id: 'spark', name: 'Spark', sprite: './sprites/spark_idle.png', color: '#FFD700', hp: 35, dmg: 90, speed: 90, volatility: 'High' },
-		{ id: 'phantom', name: 'Phantom', sprite: './sprites/phantom_idle.png', color: '#9B59B6', hp: 70, dmg: 55, speed: 60, volatility: 'Medium' }
+		{ id: 'blaze', name: 'Fire', sprite: './sprites/blaze_idle_v2.png', color: '#ff4400', hp: 76, dmg: 60, speed: 60, volatility: 'Medium' },
+		{ id: 'quake', name: 'Earth', sprite: './sprites/quake_idle.png', color: '#8B4513', hp: 100, dmg: 30, speed: 30, volatility: 'Low' },
+		{ id: 'air', name: 'Air', sprite: './sprites/air_idle.png', color: '#87CEEB', hp: 35, dmg: 90, speed: 90, volatility: 'High' },
+		{ id: 'water', name: 'Water', sprite: './sprites/water_idle.png', color: '#1E90FF', hp: 70, dmg: 55, speed: 60, volatility: 'Medium' }
 	];
 </script>
 

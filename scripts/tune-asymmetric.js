@@ -6,37 +6,37 @@
  * 
  * Target design:
  * - Each fighter has 1 strong matchup (~60%), 1 weak matchup (~40%), 1 even (~50%)
- * - blaze beats quake (55%), loses to spark (40%), even with phantom (50%)
- * - quake beats phantom (60%), loses to blaze (45%), even with spark (50%)  
- * - spark beats blaze (60%), loses to phantom (40%), even with quake (50%)
- * - phantom beats spark (60%), loses to quake (40%), even with blaze (50%)
+ * - blaze beats quake (55%), loses to air (40%), even with water (50%)
+ * - quake beats water (60%), loses to blaze (45%), even with air (50%)  
+ * - air beats blaze (60%), loses to water (40%), even with quake (50%)
+ * - water beats air (60%), loses to quake (40%), even with blaze (50%)
  */
 import { BattleSimulation } from '../src/core/simulation.js';
 
 // Target win rates for fighter A in each matchup
 const TARGETS = {
   'blaze:quake':   0.55,   // blaze favoured
-  'blaze:phantom': 0.50,   // even
-  'blaze:spark':   0.40,   // spark favoured
-  'phantom:quake': 0.40,   // quake favoured
-  'phantom:spark': 0.60,   // phantom favoured
-  'quake:spark':   0.50,   // even
+  'blaze:water': 0.50,   // even
+  'blaze:air':   0.40,   // air favoured
+  'water:quake': 0.40,   // quake favoured
+  'water:air': 0.60,   // water favoured
+  'quake:air':   0.50,   // even
 };
 
 // Tunable parameters per fighter (subset that most affects win rates)
 const TUNABLE = {
   blaze:   ['hp', 'skillCooldown', 'fireTrailDamage'],
   quake:   ['hp', 'skillCooldown', 'shockwaveDamage'],
-  spark:   ['hp', 'skillCooldown', 'boltDamage'],
-  phantom: ['hp', 'skillCooldown', 'boltDamage'],
+  air:   ['hp', 'skillCooldown', 'boltDamage'],
+  water: ['hp', 'skillCooldown', 'boltDamage'],
 };
 
 // Current defaults (from fighter files)
 let params = {
   blaze:   { hp: 73.11, skillCooldown: 150, fireTrailDamage: 3.80 },
   quake:   { hp: 85.22, skillCooldown: 112.60, shockwaveDamage: 35.00 },
-  spark:   { hp: 84.63, skillCooldown: 90.51, boltDamage: 24.00 },
-  phantom: { hp: 82.64, skillCooldown: 200, boltDamage: 26.83 },
+  air:   { hp: 84.63, skillCooldown: 90.51, boltDamage: 24.00 },
+  water: { hp: 82.64, skillCooldown: 200, boltDamage: 26.83 },
 };
 
 const BOUNDS = {

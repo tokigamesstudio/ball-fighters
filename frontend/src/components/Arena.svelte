@@ -29,14 +29,14 @@
 	const SPRITESHEET_MAP: Record<string, string> = {
 		blaze: './sprites/blaze_idle_v2.png',
 		quake: './sprites/quake_idle.png',
-		spark: './sprites/spark_idle.png',
-		phantom: './sprites/phantom_idle.png'
+		air: './sprites/air_idle.png',
+		water: './sprites/water_idle.png'
 	};
 
 	const BACKGROUNDS = ['./backgrounds/arena_colosseum.png', './backgrounds/arena_void.png'];
 
 	// Layers
-	let trailLayer: Graphics;
+	let trailLayer: Container;
 	let projectileLayer: Graphics;
 	let particleLayer: Graphics;
 	let dangerLayer: Graphics;
@@ -45,8 +45,22 @@
 	let damageLayer: Container;
 	let deathLayer: Container;
 
+	const FIRE_TRAIL_FRAMES = 10;
+	const FIRE_TRAIL_PATH = './sprites/fire-trail.jpg';
+	let fireTrailTextures: Texture[] = [];
+
 	// Fighter sprites
 	let fighterSprites: Map<string, AnimatedSprite> = new Map();
+
+	async function loadFireTrailTextures() {
+		const baseTex = await Assets.load(FIRE_TRAIL_PATH);
+		const frameW = baseTex.width / FIRE_TRAIL_FRAMES;
+		const frameH = baseTex.height;
+		for (let i = 0; i < FIRE_TRAIL_FRAMES; i++) {
+			const frame = new Rectangle(i * frameW, 0, frameW, frameH);
+			fireTrailTextures.push(new Texture({ source: baseTex.source, frame }));
+		}
+	}
 
 	// Death shatter state
 	interface ShatterPiece { sprite: Sprite; vx: number; vy: number; vr: number; life: number }
@@ -68,7 +82,9 @@
 		app = new Application();
 		await app.init({ canvas, width: W, height: H, background: '#1a1a2e', antialias: true });
 
-		trailLayer = new Graphics();
+		await loadFireTrailTextures();
+
+		trailLayer = new Container();
 		projectileLayer = new Graphics();
 		hpLayer = new Graphics();
 		particleLayer = new Graphics();
@@ -216,11 +232,23 @@
 			dangerLayer.rect(W - fd.dangerPad, 0, fd.dangerPad, H).fill({ color: 0xff0000, alpha: 0.15 });
 		}
 
-		// Fire trails
-		trailLayer.clear();
-		for (const t of fd.fireTrails) {
-			const alpha = t.life / t.maxLife;
-			trailLayer.circle(t.x, t.y, 4).fill({ color: 0xff4400, alpha: alpha * 0.6 });
+		// Fire trails (sprite-based)
+		trailLayer.removeChildren();
+		if (fireTrailTextures.length > 0) {
+			for (let i = 0; i < fd.fireTrails.length; i++) {
+				const t = fd.fireTrails[i];
+				const alpha = t.life / t.maxLife;
+				if (alpha <= 0) continue;
+				const frameIdx = (Math.floor(frameIndex * 0.15 + t.x * 0.3) % FIRE_TRAIL_FRAMES + FIRE_TRAIL_FRAMES) % FIRE_TRAIL_FRAMES;
+				const sprite = new Sprite(fireTrailTextures[frameIdx]);
+				sprite.anchor.set(0.5, 1);
+				sprite.x = t.x;
+				sprite.y = t.y;
+				sprite.width = 24;
+				sprite.height = 72;
+				sprite.alpha = alpha * 0.85;
+				trailLayer.addChild(sprite);
+			}
 		}
 
 		// Projectiles
