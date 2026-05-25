@@ -1,2 +1,0 @@
-[   37588ms] TypeError: Cannot read properties of undefined (reading '0')
-    at HTMLButtonElement.<anonymous> (http://localhost:8080/src/game.js:265:42)
